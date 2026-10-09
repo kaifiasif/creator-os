@@ -10,6 +10,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Protocol
 
+from .anthropic import BASE_HEADERS
+
 BRIDGE_TIMEOUT_S = 60
 
 
@@ -34,7 +36,7 @@ class HttpBridge:
             f"{self._url}/{tool}",
             data=json.dumps(payload).encode(),
             method="POST",
-            headers={"content-type": "application/json", "authorization": f"Bearer {self._token}"},
+            headers={**BASE_HEADERS, "authorization": f"Bearer {self._token}"},
         )
         try:
             with urllib.request.urlopen(req, timeout=BRIDGE_TIMEOUT_S) as res:

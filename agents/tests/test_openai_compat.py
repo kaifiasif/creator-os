@@ -21,7 +21,7 @@ class Stub(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         length = int(self.headers["content-length"])
-        Stub.seen.append({"path": self.path, "auth": self.headers["authorization"], "body": json.loads(self.rfile.read(length))})
+        Stub.seen.append({"path": self.path, "auth": self.headers["authorization"], "agent": self.headers["user-agent"], "accept": self.headers["accept"], "body": json.loads(self.rfile.read(length))})
         status, body, headers = Stub.script.pop(0)
         data = json.dumps(body).encode()
         self.send_response(status)
@@ -67,6 +67,9 @@ class OpenAICompatibleTest(unittest.TestCase):
         first, second = Stub.seen[0], Stub.seen[1]
         self.assertEqual(first["path"], "/openai/v1/chat/completions")
         self.assertEqual(first["auth"], "Bearer free-key-123")
+        # Cloudflare in front of Groq answers Python's default agent with 403 "error code: 1010"
+        self.assertTrue(first["agent"].startswith("creator-os-agents/"))
+        self.assertEqual(first["accept"], "application/json")
         self.assertEqual(first["body"]["messages"][0], {"role": "system", "content": "sys"})
         self.assertEqual([t["function"]["name"] for t in first["body"]["tools"]], ["echo", "submit"])
         # the tool result goes back as a role=tool message tied to the call id
@@ -90,6 +93,16 @@ class OpenAICompatibleTest(unittest.TestCase):
         with self.assertRaisesRegex(ProviderError, "too large"):
             self.client.messages({"model": "m", "system": "s", "messages": [{"role": "user", "content": "hi"}]})
         self.assertEqual(len(Stub.seen), 1)
+
+    def test_a_firewall_block_is_explained_and_not_retried(self):
+        Stub.script = [(403, "error code: 1010", {})]
+        with self.assertRaisesRegex(ProviderError, r"blocked the request at its firewall \(403, error code: 1010\)"):
+            self.client.messages({"model": "m", "system": "s", "messages": [{"role": "user", "content": "hi"}]})
+        self.assertEqual(len(Stub.seen), 1)
+
+        Stub.script = [(401, {"error": {"message": "Invalid API Key"}}, {})]
+        with self.assertRaisesRegex(ProviderError, "refused the key \\(401\\). Check LLM_API_KEY"):
+            self.client.messages({"model": "m", "system": "s", "messages": [{"role": "user", "content": "hi"}]})
 
     def test_bad_arguments_reach_validation_instead_of_crashing(self):
         out = from_chat_response({"choices": [{"message": {"content": None, "tool_calls": [{"id": "a", "function": {"name": "t", "arguments": "{not json"}}]}}]})

@@ -36,7 +36,7 @@ export function Sentence({ sentence, selected, enforce, onSelect }: { sentence: 
       onKeyDown={onKeyDown}
       className={cn(
         'cursor-pointer rounded-sm box-decoration-clone transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50',
-        problem && ['underline decoration-2 underline-offset-[5px]', PROBLEM_UNDERLINE[problem], LINE_STYLE[problem]],
+        problem && ['proof-arrive underline decoration-2 underline-offset-[5px]', PROBLEM_UNDERLINE[problem], LINE_STYLE[problem]],
         selected && 'bg-accent',
       )}
     >

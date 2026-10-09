@@ -146,11 +146,117 @@
   }
 }
 
+/*
+ * Motion. Three kinds, all defined here so the app moves one way:
+ * - enter: one short staggered entrance per screen, when you arrive on it;
+ * - ink: a proof mark being drawn, when a check result appears;
+ * - press: buttons give under the pointer.
+ * Everything finishes in its final state, so reduced motion (below) simply skips to the end.
+ */
+@layer utilities {
+  .motion-enter > * {
+    animation: rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .motion-enter > :nth-child(2) { animation-delay: 50ms; }
+  .motion-enter > :nth-child(3) { animation-delay: 100ms; }
+  .motion-enter > :nth-child(4) { animation-delay: 150ms; }
+  .motion-enter > :nth-child(5) { animation-delay: 200ms; }
+  .motion-enter > :nth-child(n + 6) { animation-delay: 250ms; }
+
+  .motion-rise {
+    animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .motion-pop {
+    animation: pop 360ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+
+  /* A proof underline drawn left to right, in the colour of its check. */
+  .proof-ink {
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 2px;
+    background-image: linear-gradient(var(--ink, currentColor), var(--ink, currentColor));
+    box-decoration-break: clone;
+    padding-bottom: 4px;
+    animation: ink 700ms cubic-bezier(0.6, 0, 0.2, 1) both;
+  }
+  /* Wavy marks repeat a tile, so they are revealed by a cover (the surface colour) sliding off them. */
+  .proof-ink-wavy {
+    background-image:
+      linear-gradient(var(--cover, var(--background)), var(--cover, var(--background))),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6'%3E%3Cpath d='M0 3 Q3 0 6 3 T12 3' fill='none' stroke='%238b5cf6' stroke-width='1.6'/%3E%3C/svg%3E");
+    background-size: 0% 6px, 12px 6px;
+    background-position: 100% 100%, 0 100%;
+    background-repeat: no-repeat, repeat-x;
+    padding-bottom: 6px;
+    animation: unveil 900ms cubic-bezier(0.6, 0, 0.2, 1) both;
+  }
+  /* A proof mark arriving on a sentence in the review (text-decoration underline). */
+  .proof-arrive {
+    animation: ink-colour 900ms ease-out both;
+  }
+  /* The reviewer striking a sentence out. */
+  .proof-strike {
+    background-image: linear-gradient(var(--strike, currentColor), var(--strike, currentColor));
+    background-repeat: no-repeat;
+    background-position: 0 55%;
+    background-size: 100% 1.5px;
+    box-decoration-break: clone;
+    animation: strike 500ms cubic-bezier(0.6, 0, 0.2, 1) both, dim 500ms ease-out both;
+  }
+
+  [data-slot='button'] {
+    transition-property: color, background-color, border-color, box-shadow, scale;
+  }
+  [data-slot='button']:active:not(:disabled) {
+    scale: 0.97;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+@keyframes ink {
+  from {
+    background-size: 0% 2px;
+  }
+}
+@keyframes strike {
+  from {
+    background-size: 0% 1.5px;
+  }
+}
+@keyframes unveil {
+  from {
+    background-size: 100% 6px, 12px 6px;
+  }
+}
+@keyframes ink-colour {
+  from {
+    text-decoration-color: transparent;
+  }
+}
+@keyframes dim {
+  to {
+    opacity: 0.45;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     transition-duration: 0.01ms !important;
   }
 }

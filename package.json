@@ -1,6 +1,6 @@
 {
   "name": "creator-os",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Turns raw material into X posts that must pass the creator's own archive before review.",
   "type": "module",
   "private": true,

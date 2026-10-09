@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { z } from 'zod';
 import type { RateLimit } from '../http/middleware/rate-limit.ts';
@@ -44,6 +45,10 @@ export const CLAUDE_MODELS = { main: 'claude-sonnet-5-5', judge: 'claude-haiku-4
 export const OPENAI_COMPATIBLE_MODELS = { main: 'openai/gpt-oss-120b', judge: 'openai/gpt-oss-20b' } as const;
 
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+  if (source === process.env) {
+    const dotenv = resolve(process.cwd(), '.env');
+    if (existsSync(dotenv)) process.loadEnvFile(dotenv);
+  }
   const parsed = EnvSchema.safeParse(source);
   if (!parsed.success) {
     const problems = parsed.error.issues.map((i) => `  ${i.path.join('.')}: ${i.message}`).join('\n');

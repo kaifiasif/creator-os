@@ -49,6 +49,7 @@ export function InboxPage() {
           ) : (
             <EmptyState
               icon={InboxIcon}
+              mascot="wave"
               title="Your inbox is empty"
               description="Capture a voice memo, a call or rough notes. Claims are pulled out with your exact words, ready to draft from."
               action={

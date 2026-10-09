@@ -46,6 +46,7 @@ How the web code is organised:
 - `web/src/components/ui/` (shadcn), `components/shared/` (page header, stat card, status badge, empty and error states), `components/layout/` (sidebar, header).
 - `web/src/lib/labels.ts`: every user-facing name for a server value, in one place.
 - Look and motion: ink and stone. Warm stone neutrals with ink (bone in dark mode), so the green, amber, red and violet proof marks are the only colour on screen. Buttons light a fuse spark along their edge on hover, tabs slide a single pill between them, loaders are a rippling 3×3 lattice, progress bars trail a wake, agents and drafting show a shimmering thinking line with rotating steps, empty screens show a floating folder, Drafts has a pile of waiting drafts you can flick through, Archive shuffles a few of your posts, and a bubble menu in the corner holds quick actions. Numbers count up, rows cascade in and proof marks draw in. All of it is CSS in `web/src/index.css` plus small components in `web/src/components/shared/motion/`; with reduced motion turned on, loops stop and everything shows its final state.
+- Mascot: Blot, an original plush ink-drop sticker. It waves on an empty inbox, writes while a draft is drafted, stamps an accepted draft, cheers in success toasts, searches on a not-found page, and a whole pile of stickers says goodbye when you log out. Pure SVG in `web/src/components/shared/mascot/`.
 
 Keyboard:
 

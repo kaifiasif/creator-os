@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mascot } from '@/components/shared/mascot/mascot';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TextLoop } from '@/components/shared/motion/text-loop';
@@ -28,6 +29,9 @@ export function GeneratingState({ createdAt }: { createdAt: string }) {
         <p className="thought-line text-sm font-medium">
           <TextLoop words={['Reading your claims', 'Drafting in your voice', 'Checking every sentence against the source', 'Comparing with your archive']} interval={2600} />
         </p>
+        <CardAction>
+          <Mascot pose="pencil" className="mascot-bob size-16" />
+        </CardAction>
         <CardDescription>Drafting from your claims, then checking every sentence against the source and your archive. This page updates on its own.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">

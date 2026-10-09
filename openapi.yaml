@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Creator OS API
-  version: 0.9.1
+  version: 0.9.2
   description: |
     Turns one creator's raw material into X posts that must pass the creator's own archive before review.
     Implements PRD v1.0 sections 6 and 9.

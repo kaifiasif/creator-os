@@ -13,6 +13,7 @@ import urllib.request
 from typing import Any
 
 from .anthropic import ProviderError, rate_limit_message, retry_after, with_retry
+from .http_headers import merge_headers
 
 REQUEST_TIMEOUT_S = 90
 # reasoning models spend part of the budget thinking before they call a tool
@@ -84,7 +85,9 @@ class OpenAICompatibleClient:
                 self._url,
                 data=body,
                 method="POST",
-                headers={"content-type": "application/json", "authorization": f"Bearer {self._api_key}"},
+                headers=merge_headers(
+                    {"content-type": "application/json", "authorization": f"Bearer {self._api_key}"},
+                ),
             )
             try:
                 with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT_S) as res:
@@ -93,6 +96,12 @@ class OpenAICompatibleClient:
                 detail = error.read()[:300].decode("utf-8", "replace")
                 if error.code in (413, 429):
                     raise ProviderError(rate_limit_message(self._vendor, error.code), retryable=error.code == 429, wait_s=retry_after(error)) from error
+                if error.code == 403 and "1010" in detail:
+                    raise ProviderError(
+                        f"{self._vendor} blocked this server's request (Cloudflare 1010). "
+                        "Restart the app after updating, or set LLM_BASE_URL to another OpenAI-compatible API.",
+                        retryable=False,
+                    ) from error
                 retryable = error.code >= 500 or error.code == 408
                 raise ProviderError(f"{self._vendor} {error.code}: {detail}", retryable) from error
 

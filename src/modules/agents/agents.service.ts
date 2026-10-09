@@ -11,13 +11,25 @@ import type { AppContext } from '../../context.ts';
 import { conflict, notFound } from '../../core/errors.ts';
 import { errorFields } from '../../core/logger.ts';
 import { nowIso, uuidv7 } from '../../domain/ids.ts';
-import type { AgentName, AgentSettings, Run, TraceStep } from '../../domain/types.ts';
+import type { AgentName, AgentRun, AgentSettings, Run, TraceStep } from '../../domain/types.ts';
 import { DecisionPrediction, ReviewSubmission, ScoreOutput, type AgentContext, type PriorOutputs, type ReviewOutput } from './agent.types.ts';
 import type { BridgeSession } from './tool-bridge.ts';
 import { draftView, loadAgentContext, ruleFacts, verifyPosts, voiceProfile } from './tools.ts';
 
 export const AGENT_VERSIONS: Record<AgentName, string> = { reviewer: 'reviewer@1', scorer: 'scorer@1', decision: 'decision@1' };
 const LOCAL_MODEL = 'local-rules@1';
+/** Space out agent runs on hosted models so free-tier RPM limits are less likely to trip mid-run. */
+const HOSTED_AGENT_GAP_MS = 2500;
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+function agentRow(rows: AgentRun[], agent: AgentName): AgentRun | undefined {
+  return rows.find((r) => r.agent === agent);
+}
+
+function doneOutput<T>(row: AgentRun | undefined): T | null {
+  return row?.status === 'done' && row.output != null ? (row.output as T) : null;
+}
 
 // ---------------------------------------------------------------- settings
 export function agentSettings(ctx: AppContext): AgentSettings {
@@ -105,10 +117,24 @@ export async function runAgents(ctx: AppContext, runId: string): Promise<void> {
   const context = { draft: draftView(agent), claims: agent.claims, posts: agent.posts, voice_profile: voiceProfile(ctx), rule_facts: ruleFacts(ctx, agent) };
   const bridge = await ctx.agents.bridge.open(ctx, agent);
   const pass: Pass = { agent, context, bridge };
+  const existing = ctx.repos.agents.listForRun(runId);
+  const hosted = ctx.config.agentsUseModel && ctx.providers.llm.name !== 'local';
   try {
-    const reviewer = await runOne(ctx, runId, 'reviewer', (trace) => review(ctx, pass, trace));
-    const scorer = await runOne(ctx, runId, 'scorer', (trace) => score(ctx, pass, trace));
-    await runOne(ctx, runId, 'decision', (trace) => predict(ctx, pass, trace, { reviewer, scorer }));
+    let reviewer = doneOutput<ReviewOutput>(agentRow(existing, 'reviewer'));
+    if (!reviewer) {
+      reviewer = await runOne(ctx, runId, 'reviewer', (trace) => review(ctx, pass, trace));
+      if (hosted) await sleep(HOSTED_AGENT_GAP_MS);
+    }
+
+    let scorer = doneOutput<ScoreOutput>(agentRow(existing, 'scorer'));
+    if (!scorer) {
+      scorer = await runOne(ctx, runId, 'scorer', (trace) => score(ctx, pass, trace));
+      if (hosted) await sleep(HOSTED_AGENT_GAP_MS);
+    }
+
+    if (!doneOutput(agentRow(existing, 'decision'))) {
+      await runOne(ctx, runId, 'decision', (trace) => predict(ctx, pass, trace, { reviewer, scorer }));
+    }
   } finally {
     bridge.close();
   }

@@ -12,6 +12,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Callable, Protocol
 
+from .http_headers import merge_headers
+
 API_URL = "https://api.anthropic.com/v1/messages"
 REQUEST_TIMEOUT_S = 90
 DEFAULT_DELAYS_MS = [1000, 4000]
@@ -21,7 +23,8 @@ class AnthropicClient(Protocol):
     def messages(self, request: dict[str, Any]) -> dict[str, Any]: ...
 
 
-MAX_WAIT_S = 20
+# Groq's free tier often asks for ~60s; honour Retry-After up to a minute before giving up.
+MAX_WAIT_S = 60
 
 
 class ProviderError(RuntimeError):
@@ -42,7 +45,10 @@ def retry_after(error: urllib.error.HTTPError) -> float | None:
 def rate_limit_message(vendor: str, status: int) -> str:
     if status == 413:
         return f"{vendor} refused the request as too large for the plan's per-minute token limit (413). Try a shorter draft, or a key with higher limits."
-    return f"{vendor} rate limit reached (429). Free plans allow only a few requests a minute: wait a minute, then use Run agents again."
+    return (
+        f"{vendor} rate limit reached (429). Free plans allow only a few requests a minute: "
+        "wait about a minute, then use Run agents again (agents that already finished are skipped)."
+    )
 
 
 def retry_delays(retry_delay_ms: int | None) -> list[float]:
@@ -87,7 +93,13 @@ class HttpAnthropicClient:
                 API_URL,
                 data=body,
                 method="POST",
-                headers={"content-type": "application/json", "x-api-key": self._api_key, "anthropic-version": "2023-06-01"},
+                headers=merge_headers(
+                    {
+                        "content-type": "application/json",
+                        "x-api-key": self._api_key,
+                        "anthropic-version": "2023-06-01",
+                    },
+                ),
             )
             try:
                 with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT_S) as res:

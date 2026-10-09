@@ -5,9 +5,9 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 /** An empty screen is an invitation to act: say what goes here and offer the action. */
 export function EmptyState({ icon: Icon, title, description, action }: { icon: LucideIcon; title: string; description: string; action?: ReactNode }) {
   return (
-    <Empty className="border border-dashed">
+    <Empty className="motion-enter border border-dashed">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
+        <EmptyMedia variant="icon" className="motion-pop bg-primary/10 text-primary">
           <Icon />
         </EmptyMedia>
         <EmptyTitle>{title}</EmptyTitle>

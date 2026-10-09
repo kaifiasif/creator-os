@@ -1,6 +1,6 @@
 [project]
 name = "creator-agents"
-version = "0.7.1"
+version = "0.8.0"
 description = "Reviewer, Scorer and Decision agents for Creator OS, served to the web app over a local HTTP API."
 requires-python = ">=3.10"
 dependencies = []

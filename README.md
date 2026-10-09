@@ -45,6 +45,7 @@ How the web code is organised:
 - `web/src/api/`: a typed client generated from the server's own route types (Hono RPC), so the web app and API cannot drift apart.
 - `web/src/components/ui/` (shadcn), `components/shared/` (page header, stat card, status badge, empty and error states), `components/layout/` (sidebar, header).
 - `web/src/lib/labels.ts`: every user-facing name for a server value, in one place.
+- Look and motion: an editor's desk. Cool paper and blue-black ink (a navy night desk in dark mode), with the editor's blue pencil as the one brand colour. Each screen sits on faint ruled lines, its title gets a pencil tick, headline numbers count up, table rows cascade in, the active nav item and hovered rows get a pencil mark in the margin, selected sentences get a pencil sweep, and proof marks draw in when checks arrive. All of it is CSS in `web/src/index.css` plus a small `CountUp` component; with reduced motion turned on everything shows its final state at once.
 
 Keyboard:
 
@@ -67,7 +68,7 @@ Screens:
 - **Audience** (a tab on a decided draft): rehearses the post with 12 simulated followers over 10 rounds, then shows likes, replies, pushback and which sentences people reacted to. It uses the same `LLM_API_KEY` (Groq by default); without a key it shows a labelled rule-based estimate.
 - **Archive**: your posts, import with a preview, retire and restore, and calibration of the repeat threshold.
 - **Results**: acceptance with and without checks, rejections, flags, agents, drift and the run table with CSV export. Locked until every draft in review has a decision.
-- **Log in** and **sign up**: every creator has their own account and sees only their own data. The first account takes over anything already in the database.
+- **Log in** and **sign up**: every creator has their own account and sees only their own data. The first account takes over anything already in the database. On wide screens the right half plays a short demo once: a draft from a voice memo getting its proof marks, and the Reviewer striking the invented number.
 - **Settings**: your account (password, log out), optional 2-step codes, agents, theme, and which providers are active.
 
 ## Providers: works offline, better with keys
@@ -88,7 +89,7 @@ Screens:
 | `CREATOR_OS_PYTHON` | The Python the agents run on, for example `python3.12` or a full path | `python3` |
 | `CREATOR_OS_AGENTS_URL`, `AGENTS_SERVICE_TOKEN` | Use an agents service you started yourself (`npm run agents` with the same token) on the same machine, for example to debug it | The app starts and stops the agents service itself |
 
-The Reviewer, Scorer and Decision agents use tool calling on whichever model is set: Claude first, then the `LLM_API_KEY` model. With neither, they run their local rule versions. Free plans allow only a few requests a minute; when the limit is hit the agent waits and retries twice, and if it is still limited it fails with a message saying to wait a minute and use "Run agents again".
+The Reviewer, Scorer and Decision agents use tool calling on whichever model is set: Claude first, then the `LLM_API_KEY` model. With neither, they run their local rule versions. Free plans allow only a few requests a minute; when the limit is hit the agent waits and retries twice, and if it is still limited it fails with a message saying to wait a minute and use "Run agents again". A `403 ... error code: 1010` means the provider's firewall refused the request rather than the key; every request names itself with a `creator-os` user agent, which Groq's firewall requires since v0.7.2.
 
 Third-party calls only happen for the keys you set. Calls with other people require ticking a consent box before they are processed.
 
@@ -166,7 +167,8 @@ Not built: blind voice test (FR-013), LinkedIn adapter (FR-016, out of scope by 
 
 It is one service: `npm start` runs the web app, which starts the Python agents next to it. The host needs Node 22.18+ and Python 3.10+, and a disk for `data/`.
 
-- **Any host with Docker** (Render, Fly.io, Railway, a VPS): the included `Dockerfile` has both. Mount a persistent disk at `/app/data`.
+- **Render** (set up in `render.yaml`): in Render choose **New > Blueprint** and pick this repo. It builds the `Dockerfile` on the Starter plan with a 1 GB disk at `/app/data`, checks `/api/health`, and sets `NODE_ENV`, `HOST`, `TRUST_PROXY=1` and closed sign-up for you. It asks for `CREATOR_OS_OWNER_EMAIL` (the email you will sign up with) and the provider keys you want; leave any key blank to skip it.
+- **Any other host with Docker** (Fly.io, Railway, a VPS): the included `Dockerfile` has both. Mount a persistent disk at `/app/data`; the entrypoint hands a root-owned disk to the `node` user before the app starts.
 - **A host with Node and Python already installed**: build command `npm ci --omit=dev`, start command `npm start`.
 
 Set `NODE_ENV=production`, `HOST=0.0.0.0`, `TRUST_PROXY=1` behind Render or Fly, `CREATOR_OS_OWNER_EMAIL` if you bring an existing database, and the provider keys you want (`LLM_API_KEY` for Groq's free tier). The agents service needs no port of its own and is never reachable from outside: it listens on 127.0.0.1 only.

@@ -5,40 +5,44 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* shadcn/ui new-york-v4 neutral theme, plus four proof colours that only ever mark check results. */
+/*
+ * shadcn/ui new-york-v4 tokens, tuned to one idea: an editor's desk. Cool paper and blue-black ink in
+ * light, a night desk in dark, and the editor's blue pencil as the one brand colour (primary, focus,
+ * selection, the active place). Four proof colours only ever mark check results; blue never does.
+ */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.99 0.003 255);
+  --foreground: oklch(0.2 0.03 262);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.2 0.03 262);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.2 0.03 262);
+  --primary: oklch(0.5 0.2 263);
+  --primary-foreground: oklch(0.985 0.005 255);
+  --secondary: oklch(0.965 0.008 258);
+  --secondary-foreground: oklch(0.25 0.04 262);
+  --muted: oklch(0.965 0.008 258);
+  --muted-foreground: oklch(0.52 0.025 260);
+  --accent: oklch(0.955 0.02 262);
+  --accent-foreground: oklch(0.32 0.1 263);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.915 0.01 258);
+  --input: oklch(0.9 0.012 258);
+  --ring: oklch(0.6 0.17 263);
   --chart-1: oklch(0.809 0.105 251.813);
   --chart-2: oklch(0.623 0.214 259.815);
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.975 0.006 258);
+  --sidebar-foreground: oklch(0.2 0.03 262);
+  --sidebar-primary: oklch(0.5 0.2 263);
+  --sidebar-primary-foreground: oklch(0.985 0.005 255);
+  --sidebar-accent: oklch(0.94 0.022 262);
+  --sidebar-accent-foreground: oklch(0.32 0.1 263);
+  --sidebar-border: oklch(0.915 0.01 258);
+  --sidebar-ring: oklch(0.6 0.17 263);
 
   --supported: oklch(0.6 0.13 163);
   --partial: oklch(0.7 0.15 70);
@@ -47,32 +51,32 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.155 0.012 262);
+  --foreground: oklch(0.96 0.005 258);
+  --card: oklch(0.19 0.015 262);
+  --card-foreground: oklch(0.96 0.005 258);
+  --popover: oklch(0.2 0.016 262);
+  --popover-foreground: oklch(0.96 0.005 258);
+  --primary: oklch(0.72 0.14 258);
+  --primary-foreground: oklch(0.17 0.03 262);
+  --secondary: oklch(0.24 0.016 262);
+  --secondary-foreground: oklch(0.96 0.005 258);
+  --muted: oklch(0.24 0.016 262);
+  --muted-foreground: oklch(0.71 0.02 258);
+  --accent: oklch(0.26 0.03 262);
+  --accent-foreground: oklch(0.93 0.03 258);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: oklch(0.85 0.03 258 / 11%);
+  --input: oklch(0.85 0.03 258 / 16%);
+  --ring: oklch(0.65 0.15 258);
+  --sidebar: oklch(0.175 0.014 262);
+  --sidebar-foreground: oklch(0.96 0.005 258);
+  --sidebar-primary: oklch(0.72 0.14 258);
+  --sidebar-primary-foreground: oklch(0.17 0.03 262);
+  --sidebar-accent: oklch(0.25 0.035 262);
+  --sidebar-accent-foreground: oklch(0.95 0.02 258);
+  --sidebar-border: oklch(0.85 0.03 258 / 11%);
+  --sidebar-ring: oklch(0.65 0.15 258);
 
   --supported: oklch(0.72 0.15 163);
   --partial: oklch(0.8 0.15 75);
@@ -146,11 +150,256 @@
   }
 }
 
+/*
+ * Motion, all defined here so the app moves one way. The vocabulary is an editor's hand:
+ * - enter: one short staggered entrance per screen, rows cascading in, tabs settling;
+ * - pencil: blue strokes that mark where you are (title tick, nav margin, row margin, selection);
+ * - ink: a proof mark being drawn, in its check colour, when a result appears;
+ * - press and lift: buttons give under the pointer, pickable cards rise toward it.
+ * Everything finishes in its final state, so reduced motion (below) simply skips to the end. The only
+ * loop is the loading sheen, and reduced motion stops that too.
+ */
+@layer utilities {
+  .motion-enter > * {
+    animation: rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .motion-enter > :nth-child(2) { animation-delay: 50ms; }
+  .motion-enter > :nth-child(3) { animation-delay: 100ms; }
+  .motion-enter > :nth-child(4) { animation-delay: 150ms; }
+  .motion-enter > :nth-child(5) { animation-delay: 200ms; }
+  .motion-enter > :nth-child(n + 6) { animation-delay: 250ms; }
+
+  .motion-rise {
+    animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .motion-pop {
+    animation: pop 360ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+
+  /* A proof underline drawn left to right, in the colour of its check. */
+  .proof-ink {
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 2px;
+    background-image: linear-gradient(var(--ink, currentColor), var(--ink, currentColor));
+    box-decoration-break: clone;
+    padding-bottom: 4px;
+    animation: ink 700ms cubic-bezier(0.6, 0, 0.2, 1) both;
+  }
+  /* Wavy marks repeat a tile, so they are revealed by a cover (the surface colour) sliding off them. */
+  .proof-ink-wavy {
+    background-image:
+      linear-gradient(var(--cover, var(--background)), var(--cover, var(--background))),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6'%3E%3Cpath d='M0 3 Q3 0 6 3 T12 3' fill='none' stroke='%238b5cf6' stroke-width='1.6'/%3E%3C/svg%3E");
+    background-size: 0% 6px, 12px 6px;
+    background-position: 100% 100%, 0 100%;
+    background-repeat: no-repeat, repeat-x;
+    padding-bottom: 6px;
+    animation: unveil 900ms cubic-bezier(0.6, 0, 0.2, 1) both;
+  }
+  /* A proof mark arriving on a sentence in the review (text-decoration underline). */
+  .proof-arrive {
+    animation: ink-colour 900ms ease-out both;
+  }
+  /* The reviewer striking a sentence out. */
+  .proof-strike {
+    background-image: linear-gradient(var(--strike, currentColor), var(--strike, currentColor));
+    background-repeat: no-repeat;
+    background-position: 0 55%;
+    background-size: 100% 1.5px;
+    box-decoration-break: clone;
+    animation: strike 500ms cubic-bezier(0.6, 0, 0.2, 1) both, dim 500ms ease-out both;
+  }
+
+  [data-slot='button'] {
+    transition-property: color, background-color, border-color, box-shadow, scale, translate;
+  }
+
+  /* The editor's tick: a short blue-pencil stroke under each screen's title, drawn as you arrive. */
+  .title-mark::after {
+    content: '';
+    display: block;
+    width: 2.25rem;
+    height: 3px;
+    margin-top: 0.5rem;
+    border-radius: 3px;
+    background: var(--primary);
+    transform-origin: left;
+    animation: draw-x 520ms 160ms cubic-bezier(0.6, 0, 0.2, 1) both;
+  }
+
+  /* Every screen sits on a sheet of ruled paper: faint pencil-blue lines that fade out under the header. */
+  .ruled {
+    position: relative;
+    isolation: isolate;
+  }
+  .ruled::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 260px;
+    z-index: -1;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in oklch, var(--primary) 7%, transparent) 27px 28px);
+    mask-image: linear-gradient(to bottom, black, transparent);
+    animation: fade-in 900ms ease-out both;
+  }
+
+  /* Where you are: the active nav item carries a blue-pencil mark in the margin. */
+  [data-slot='sidebar-menu-button'] {
+    position: relative;
+  }
+  [data-slot='sidebar-menu-button'] > svg {
+    transition: translate 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  [data-slot='sidebar-menu-button']:hover > svg {
+    translate: 2px 0;
+  }
+  [data-slot='sidebar-menu-button'][data-active='true']::before {
+    content: '';
+    position: absolute;
+    inset-block: 7px;
+    left: 0;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--sidebar-primary);
+    transform-origin: top;
+    animation: draw-y 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  /* Rows arrive in a quick cascade; hovering one puts the pencil in its margin. */
+  [data-slot='table-body'] > tr {
+    animation: rise 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  [data-slot='table-body'] > tr:nth-child(2) { animation-delay: 30ms; }
+  [data-slot='table-body'] > tr:nth-child(3) { animation-delay: 60ms; }
+  [data-slot='table-body'] > tr:nth-child(4) { animation-delay: 90ms; }
+  [data-slot='table-body'] > tr:nth-child(5) { animation-delay: 120ms; }
+  [data-slot='table-body'] > tr:nth-child(6) { animation-delay: 150ms; }
+  [data-slot='table-body'] > tr:nth-child(7) { animation-delay: 180ms; }
+  [data-slot='table-body'] > tr:nth-child(n + 8) { animation-delay: 210ms; }
+  [data-slot='table-body'] > tr[data-slot='table-row'] {
+    transition: background-color 150ms, box-shadow 150ms;
+  }
+  [data-slot='table-body'] > tr[data-slot='table-row']:hover {
+    box-shadow: inset 2px 0 0 var(--primary);
+  }
+
+  /* Switching tabs: the new panel settles in. */
+  [data-slot='tabs-content'][data-state='active'] {
+    animation: rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  /* A card you can pick lifts toward the pointer, and the picked one keeps a pencil-blue edge. */
+  .lift {
+    transition: translate 200ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 200ms, border-color 200ms, background-color 200ms;
+  }
+  .lift:hover {
+    translate: 0 -2px;
+    box-shadow: 0 8px 24px -12px color-mix(in oklch, var(--primary) 45%, transparent);
+  }
+
+  /* A selected sentence is highlighted the way an editor would: a pencil sweep from the left. */
+  .pencil-select {
+    background-image: linear-gradient(color-mix(in oklch, var(--primary) 16%, transparent), color-mix(in oklch, var(--primary) 16%, transparent));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    transition: background-size 380ms cubic-bezier(0.6, 0, 0.2, 1);
+  }
+  .pencil-select[aria-pressed='true'] {
+    background-size: 100% 100%;
+  }
+
+  /* Waiting on the model: a pencil-blue sheen passes over the placeholder lines. The one loop, and only while loading. */
+  .ink-sweep {
+    background-image: linear-gradient(100deg, transparent 20%, color-mix(in oklch, var(--primary) 18%, transparent) 50%, transparent 80%);
+    background-size: 200% 100%;
+    animation: sweep 1.6s linear infinite;
+  }
+
+  .motion-turn {
+    animation: turn 420ms cubic-bezier(0.3, 1.3, 0.5, 1) both;
+  }
+  [data-slot='button']:active:not(:disabled) {
+    scale: 0.97;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes draw-x {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes draw-y {
+  from {
+    scale: 1 0;
+  }
+}
+@keyframes sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@keyframes turn {
+  from {
+    opacity: 0;
+    rotate: -90deg;
+    scale: 0.6;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+@keyframes ink {
+  from {
+    background-size: 0% 2px;
+  }
+}
+@keyframes strike {
+  from {
+    background-size: 0% 1.5px;
+  }
+}
+@keyframes unveil {
+  from {
+    background-size: 100% 6px, 12px 6px;
+  }
+}
+@keyframes ink-colour {
+  from {
+    text-decoration-color: transparent;
+  }
+}
+@keyframes dim {
+  to {
+    opacity: 0.45;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

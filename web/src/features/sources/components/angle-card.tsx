@@ -31,7 +31,7 @@ function ClosestPost({ closest }: { closest: Angle['closest_archive'] }) {
 export function AngleCard({ angle, index }: { angle: Angle; index: number }) {
   const id = `angle-${angle.id}`;
   return (
-    <FieldLabel htmlFor={id}>
+    <FieldLabel htmlFor={id} className="lift">
       <Field orientation="horizontal" className="items-start">
         <FieldContent className="gap-2">
           <div className="flex flex-wrap items-center gap-2">

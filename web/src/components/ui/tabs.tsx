@@ -39,19 +39,55 @@ const tabsListVariants = cva(
   }
 )
 
+/**
+ * Glide: on the default variant the active tab is drawn by one pill that slides between triggers,
+ * instead of each trigger painting its own background. It follows data-state changes and resizes.
+ */
+function useGlide(enabled: boolean) {
+  const listRef = React.useRef<HTMLDivElement>(null)
+  const [pill, setPill] = React.useState<{ x: number; w: number } | null>(null)
+
+  React.useLayoutEffect(() => {
+    const list = listRef.current
+    if (!enabled || !list) return
+    const measure = () => {
+      const active = list.querySelector<HTMLElement>(':scope > [data-slot="tabs-trigger"][data-state="active"]')
+      setPill(active ? { x: active.offsetLeft, w: active.offsetWidth } : null)
+    }
+    measure()
+    const mutations = new MutationObserver(measure)
+    mutations.observe(list, { attributes: true, subtree: true, attributeFilter: ["data-state"] })
+    const resize = new ResizeObserver(measure)
+    resize.observe(list)
+    return () => {
+      mutations.disconnect()
+      resize.disconnect()
+    }
+  }, [enabled])
+
+  return { listRef, pill }
+}
+
 function TabsList({
   className,
   variant = "default",
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
+  const { listRef, pill } = useGlide(variant === "default")
   return (
     <TabsPrimitive.List
+      ref={listRef}
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
+      data-glide={pill ? "on" : undefined}
+      className={cn(tabsListVariants({ variant }), "relative", className)}
       {...props}
-    />
+    >
+      {pill && <span aria-hidden data-slot="tabs-glide" style={{ translate: `${pill.x}px 0`, width: pill.w }} />}
+      {children}
+    </TabsPrimitive.List>
   )
 }
 

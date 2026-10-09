@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useArchive } from './api';
+import { ArchiveShuffle } from './components/archive-shuffle';
 import { ArchiveStats } from './components/archive-stats';
 import { CalibrationPanel } from './components/calibration-panel';
 import { ImportDialog } from './components/import-dialog';
@@ -50,6 +51,8 @@ export function ArchivePage() {
                 action={importButton}
               />
             ) : (
+              <>
+              <ArchiveShuffle archive={data} />
               <Tabs defaultValue="posts" className="gap-4">
                 <TabsList>
                   <TabsTrigger value="posts">Posts</TabsTrigger>
@@ -62,6 +65,7 @@ export function ArchivePage() {
                   <CalibrationPanel />
                 </TabsContent>
               </Tabs>
+              </>
             )}
           </>
         )}

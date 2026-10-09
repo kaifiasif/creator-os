@@ -33,7 +33,8 @@ export function AgentFrame({ icon: Icon, title, agent, hiddenText, onRetry, chil
       {agent.status === 'hidden' && <p className="text-sm text-muted-foreground">{hiddenText}</p>}
       {agent.status === 'running' && (
         <div className="grid gap-2" aria-busy>
-          <Skeleton className="h-4 w-4/5" />
+          <p className="thought-line text-sm">Thinking it through, using the same checks you see</p>
+          <Skeleton className="ink-sweep h-4 w-4/5" />
           <Skeleton className="h-4 w-3/5" />
         </div>
       )}

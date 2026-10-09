@@ -6,44 +6,46 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * shadcn/ui new-york-v4 tokens, tuned to one idea: an editor's desk. Cool paper and blue-black ink in
- * light, a night desk in dark, and the editor's blue pencil as the one brand colour (primary, focus,
- * selection, the active place). Four proof colours only ever mark check results; blue never does.
+ * shadcn/ui new-york-v4 tokens, tuned to "ink and stone": warm stone neutrals, ink as the one strong
+ * colour in light mode and bone in dark. Colour is kept for meaning: four proof colours only ever mark
+ * check results, so they are the only saturated things on screen. One extra warm tone, --ember, is
+ * used for nothing but the fuse spark on a hovered button.
  */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.99 0.003 255);
-  --foreground: oklch(0.2 0.03 262);
+  --background: oklch(0.985 0.002 75);
+  --foreground: oklch(0.2 0.006 60);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.03 262);
+  --card-foreground: oklch(0.2 0.006 60);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.03 262);
-  --primary: oklch(0.5 0.2 263);
-  --primary-foreground: oklch(0.985 0.005 255);
-  --secondary: oklch(0.965 0.008 258);
-  --secondary-foreground: oklch(0.25 0.04 262);
-  --muted: oklch(0.965 0.008 258);
-  --muted-foreground: oklch(0.52 0.025 260);
-  --accent: oklch(0.955 0.02 262);
-  --accent-foreground: oklch(0.32 0.1 263);
+  --popover-foreground: oklch(0.2 0.006 60);
+  --primary: oklch(0.22 0.006 60);
+  --primary-foreground: oklch(0.97 0.004 80);
+  --secondary: oklch(0.96 0.003 75);
+  --secondary-foreground: oklch(0.24 0.006 60);
+  --muted: oklch(0.96 0.003 75);
+  --muted-foreground: oklch(0.52 0.008 65);
+  --accent: oklch(0.95 0.004 75);
+  --accent-foreground: oklch(0.2 0.006 60);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.915 0.01 258);
-  --input: oklch(0.9 0.012 258);
-  --ring: oklch(0.6 0.17 263);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.975 0.006 258);
-  --sidebar-foreground: oklch(0.2 0.03 262);
-  --sidebar-primary: oklch(0.5 0.2 263);
-  --sidebar-primary-foreground: oklch(0.985 0.005 255);
-  --sidebar-accent: oklch(0.94 0.022 262);
-  --sidebar-accent-foreground: oklch(0.32 0.1 263);
-  --sidebar-border: oklch(0.915 0.01 258);
-  --sidebar-ring: oklch(0.6 0.17 263);
+  --border: oklch(0.91 0.004 75);
+  --input: oklch(0.89 0.005 75);
+  --ring: oklch(0.55 0.01 65);
+  --chart-1: oklch(0.82 0.01 70);
+  --chart-2: oklch(0.66 0.012 65);
+  --chart-3: oklch(0.52 0.012 60);
+  --chart-4: oklch(0.4 0.01 60);
+  --chart-5: oklch(0.3 0.008 60);
+  --sidebar: oklch(0.97 0.003 75);
+  --sidebar-foreground: oklch(0.2 0.006 60);
+  --sidebar-primary: oklch(0.22 0.006 60);
+  --sidebar-primary-foreground: oklch(0.97 0.004 80);
+  --sidebar-accent: oklch(0.93 0.004 75);
+  --sidebar-accent-foreground: oklch(0.2 0.006 60);
+  --sidebar-border: oklch(0.91 0.004 75);
+  --sidebar-ring: oklch(0.55 0.01 65);
 
+  --ember: oklch(0.78 0.14 60);
   --supported: oklch(0.6 0.13 163);
   --partial: oklch(0.7 0.15 70);
   --unsupported: oklch(0.577 0.245 27.325);
@@ -51,33 +53,39 @@
 }
 
 .dark {
-  --background: oklch(0.155 0.012 262);
-  --foreground: oklch(0.96 0.005 258);
-  --card: oklch(0.19 0.015 262);
-  --card-foreground: oklch(0.96 0.005 258);
-  --popover: oklch(0.2 0.016 262);
-  --popover-foreground: oklch(0.96 0.005 258);
-  --primary: oklch(0.72 0.14 258);
-  --primary-foreground: oklch(0.17 0.03 262);
-  --secondary: oklch(0.24 0.016 262);
-  --secondary-foreground: oklch(0.96 0.005 258);
-  --muted: oklch(0.24 0.016 262);
-  --muted-foreground: oklch(0.71 0.02 258);
-  --accent: oklch(0.26 0.03 262);
-  --accent-foreground: oklch(0.93 0.03 258);
+  --background: oklch(0.16 0.004 60);
+  --foreground: oklch(0.95 0.005 80);
+  --card: oklch(0.195 0.005 60);
+  --card-foreground: oklch(0.95 0.005 80);
+  --popover: oklch(0.21 0.005 60);
+  --popover-foreground: oklch(0.95 0.005 80);
+  --primary: oklch(0.93 0.008 80);
+  --primary-foreground: oklch(0.19 0.005 60);
+  --secondary: oklch(0.25 0.005 60);
+  --secondary-foreground: oklch(0.95 0.005 80);
+  --muted: oklch(0.25 0.005 60);
+  --muted-foreground: oklch(0.7 0.008 75);
+  --accent: oklch(0.26 0.006 60);
+  --accent-foreground: oklch(0.95 0.005 80);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.85 0.03 258 / 11%);
-  --input: oklch(0.85 0.03 258 / 16%);
-  --ring: oklch(0.65 0.15 258);
-  --sidebar: oklch(0.175 0.014 262);
-  --sidebar-foreground: oklch(0.96 0.005 258);
-  --sidebar-primary: oklch(0.72 0.14 258);
-  --sidebar-primary-foreground: oklch(0.17 0.03 262);
-  --sidebar-accent: oklch(0.25 0.035 262);
-  --sidebar-accent-foreground: oklch(0.95 0.02 258);
-  --sidebar-border: oklch(0.85 0.03 258 / 11%);
-  --sidebar-ring: oklch(0.65 0.15 258);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 13%);
+  --ring: oklch(0.6 0.01 70);
+  --chart-1: oklch(0.88 0.01 75);
+  --chart-2: oklch(0.74 0.012 70);
+  --chart-3: oklch(0.6 0.012 65);
+  --chart-4: oklch(0.48 0.01 60);
+  --chart-5: oklch(0.38 0.008 60);
+  --sidebar: oklch(0.18 0.005 60);
+  --sidebar-foreground: oklch(0.95 0.005 80);
+  --sidebar-primary: oklch(0.93 0.008 80);
+  --sidebar-primary-foreground: oklch(0.19 0.005 60);
+  --sidebar-accent: oklch(0.25 0.006 60);
+  --sidebar-accent-foreground: oklch(0.95 0.005 80);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.6 0.01 70);
 
+  --ember: oklch(0.8 0.13 65);
   --supported: oklch(0.72 0.15 163);
   --partial: oklch(0.8 0.15 75);
   --unsupported: oklch(0.704 0.191 22.216);
@@ -153,7 +161,10 @@
 /*
  * Motion, all defined here so the app moves one way. The vocabulary is an editor's hand:
  * - enter: one short staggered entrance per screen, rows cascading in, tabs settling;
- * - pencil: blue strokes that mark where you are (title tick, nav margin, row margin, selection);
+ * - marks: short ink strokes that show where you are (nav margin, row margin, selected sentence);
+ * - micro-interactions: a fuse spark on hovered buttons, a gliding tab pill, a lattice loader, a wake
+ *   on progress bars, a thinking line while agents work, floating folders on empty screens, a bubble
+ *   menu, and two card stacks (one you flick through, one that shuffles itself);
  * - ink: a proof mark being drawn, in its check colour, when a result appears;
  * - press and lift: buttons give under the pointer, pickable cards rise toward it.
  * Everything finishes in its final state, so reduced motion (below) simply skips to the end. The only
@@ -215,37 +226,7 @@
     transition-property: color, background-color, border-color, box-shadow, scale, translate;
   }
 
-  /* The editor's tick: a short blue-pencil stroke under each screen's title, drawn as you arrive. */
-  .title-mark::after {
-    content: '';
-    display: block;
-    width: 2.25rem;
-    height: 3px;
-    margin-top: 0.5rem;
-    border-radius: 3px;
-    background: var(--primary);
-    transform-origin: left;
-    animation: draw-x 520ms 160ms cubic-bezier(0.6, 0, 0.2, 1) both;
-  }
-
-  /* Every screen sits on a sheet of ruled paper: faint pencil-blue lines that fade out under the header. */
-  .ruled {
-    position: relative;
-    isolation: isolate;
-  }
-  .ruled::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto;
-    height: 260px;
-    z-index: -1;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in oklch, var(--primary) 7%, transparent) 27px 28px);
-    mask-image: linear-gradient(to bottom, black, transparent);
-    animation: fade-in 900ms ease-out both;
-  }
-
-  /* Where you are: the active nav item carries a blue-pencil mark in the margin. */
+  /* Where you are: the active nav item carries a short ink mark in the margin. */
   [data-slot='sidebar-menu-button'] {
     position: relative;
   }
@@ -267,7 +248,7 @@
     animation: draw-y 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  /* Rows arrive in a quick cascade; hovering one puts the pencil in its margin. */
+  /* Rows arrive in a quick cascade; hovering one puts an ink mark in its margin. */
   [data-slot='table-body'] > tr {
     animation: rise 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
@@ -290,18 +271,18 @@
     animation: rise 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  /* A card you can pick lifts toward the pointer, and the picked one keeps a pencil-blue edge. */
+  /* A card you can pick lifts toward the pointer. */
   .lift {
     transition: translate 200ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 200ms, border-color 200ms, background-color 200ms;
   }
   .lift:hover {
     translate: 0 -2px;
-    box-shadow: 0 8px 24px -12px color-mix(in oklch, var(--primary) 45%, transparent);
+    box-shadow: 0 10px 28px -14px oklch(0 0 0 / 35%);
   }
 
-  /* A selected sentence is highlighted the way an editor would: a pencil sweep from the left. */
+  /* A selected sentence is highlighted the way an editor would: a marker sweep from the left. */
   .pencil-select {
-    background-image: linear-gradient(color-mix(in oklch, var(--primary) 16%, transparent), color-mix(in oklch, var(--primary) 16%, transparent));
+    background-image: linear-gradient(color-mix(in oklch, var(--foreground) 9%, transparent), color-mix(in oklch, var(--foreground) 9%, transparent));
     background-repeat: no-repeat;
     background-size: 0% 100%;
     transition: background-size 380ms cubic-bezier(0.6, 0, 0.2, 1);
@@ -310,9 +291,9 @@
     background-size: 100% 100%;
   }
 
-  /* Waiting on the model: a pencil-blue sheen passes over the placeholder lines. The one loop, and only while loading. */
+  /* Waiting on the model: a sheen passes over the placeholder lines. Loops only while loading. */
   .ink-sweep {
-    background-image: linear-gradient(100deg, transparent 20%, color-mix(in oklch, var(--primary) 18%, transparent) 50%, transparent 80%);
+    background-image: linear-gradient(100deg, transparent 20%, color-mix(in oklch, var(--foreground) 10%, transparent) 50%, transparent 80%);
     background-size: 200% 100%;
     animation: sweep 1.6s linear infinite;
   }
@@ -325,9 +306,235 @@
   }
 }
 
+/* Micro-interactions. Each is CSS on a data-slot or a small component in components/shared/motion. */
+@property --fuse-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@layer utilities {
+  /* Fuse: hovering a main button lights a spark that runs around its edge. */
+  [data-slot='button'][data-variant='default'] {
+    position: relative;
+    isolation: isolate;
+  }
+  [data-slot='button'][data-variant='default']::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--fuse-angle), transparent 0 72%, var(--ember) 88%, oklch(1 0 0 / 90%) 92%, transparent 96%);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    opacity: 0;
+    transition: opacity 200ms;
+    pointer-events: none;
+  }
+  [data-slot='button'][data-variant='default']:hover:not(:disabled)::after {
+    opacity: 1;
+    animation: fuse 1.6s linear infinite;
+  }
+
+  /* Glide: the active tab is a pill that slides between tabs (positioned by TabsList). */
+  [data-slot='tabs-glide'] {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--background);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 8%), 0 0 0 1px var(--border);
+    transition: translate 380ms cubic-bezier(0.3, 1.25, 0.5, 1), width 380ms cubic-bezier(0.3, 1.25, 0.5, 1);
+    pointer-events: none;
+  }
+  .dark [data-slot='tabs-glide'] {
+    background: var(--accent);
+  }
+  [data-glide='on'] > [data-slot='tabs-trigger'] {
+    z-index: 1;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+
+  /* Wake: a progress bar trails a soft wake behind a bright head. */
+  [data-slot='progress-indicator'] {
+    background: linear-gradient(90deg, color-mix(in oklch, var(--primary) 25%, transparent), var(--primary)) !important;
+    transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1) !important;
+    position: relative;
+  }
+  [data-slot='progress-indicator']::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    translate: 40% -50%;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 55%, transparent), transparent 70%);
+  }
+
+  /* Lattice: nine dots that ripple corner to corner; the app's loading indicator. */
+  .lattice {
+    display: inline-grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14%;
+    aspect-ratio: 1;
+    flex-shrink: 0;
+  }
+  .lattice > i {
+    border-radius: 30%;
+    background: currentColor;
+    animation: lattice 1.2s ease-in-out infinite both;
+  }
+  .lattice > i:nth-child(2),
+  .lattice > i:nth-child(4) { animation-delay: 0.1s; }
+  .lattice > i:nth-child(3),
+  .lattice > i:nth-child(5),
+  .lattice > i:nth-child(7) { animation-delay: 0.2s; }
+  .lattice > i:nth-child(6),
+  .lattice > i:nth-child(8) { animation-delay: 0.3s; }
+  .lattice > i:nth-child(9) { animation-delay: 0.4s; }
+
+  /* Thought line: text that shimmers while something is thinking. */
+  .thought-line {
+    background: linear-gradient(90deg, var(--muted-foreground) 0%, var(--muted-foreground) 35%, var(--foreground) 50%, var(--muted-foreground) 65%, var(--muted-foreground) 100%);
+    background-size: 250% 100%;
+    background-clip: text;
+    color: transparent;
+    animation: sweep 2.2s linear infinite;
+  }
+
+  /* Text loop: one word at a time, sliding up out of a clipped line. */
+  .text-loop {
+    display: inline-grid;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+  .text-loop > span {
+    grid-area: 1 / 1;
+    animation: loop-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  /* Folder float: an empty screen shows a folder whose pages drift up, and rise further on hover. */
+  .folder {
+    position: relative;
+    width: 76px;
+    height: 58px;
+    margin-bottom: 0.5rem;
+  }
+  .folder-back,
+  .folder-front {
+    position: absolute;
+    inset-inline: 0;
+    border-radius: 8px;
+  }
+  .folder-back {
+    top: 0;
+    bottom: 0;
+    background: color-mix(in oklch, var(--foreground) 16%, var(--background));
+  }
+  .folder-back::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 30px;
+    height: 12px;
+    border-radius: 6px 6px 0 0;
+    background: inherit;
+  }
+  .folder-paper {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    height: 40px;
+    bottom: 10px;
+    border-radius: 4px;
+    background: var(--card);
+    box-shadow: 0 1px 3px oklch(0 0 0 / 15%);
+    animation: drift 3.2s ease-in-out infinite;
+    transition: translate 300ms cubic-bezier(0.3, 1.3, 0.5, 1);
+  }
+  .folder-paper:nth-child(3) {
+    left: 18px;
+    right: 6px;
+    animation-delay: -1.6s;
+  }
+  .folder-front {
+    bottom: 0;
+    height: 62%;
+    background: color-mix(in oklch, var(--foreground) 26%, var(--background));
+    transform-origin: bottom;
+    transition: transform 300ms cubic-bezier(0.3, 1.3, 0.5, 1);
+    display: grid;
+    place-items: center;
+    color: var(--background);
+  }
+  .folder-front svg {
+    width: 18px;
+    height: 18px;
+  }
+  [data-slot='empty']:hover .folder-front {
+    transform: perspective(300px) rotateX(-28deg);
+  }
+  [data-slot='empty']:hover .folder-paper {
+    translate: 0 -12px;
+  }
+
+  /* Bubble menu: quick actions that pop out one bubble at a time. */
+  .bubble {
+    animation: bubble 420ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+
+  /* Stack and card swap: cards piled with a slight fan; the front one leaves, the rest move up. */
+  .stack-card {
+    transition: transform 500ms cubic-bezier(0.3, 1.2, 0.5, 1), opacity 400ms, box-shadow 300ms;
+    will-change: transform;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes fuse {
+  to {
+    --fuse-angle: 360deg;
+  }
+}
+@keyframes lattice {
+  0%,
+  70%,
+  100% {
+    opacity: 0.25;
+    scale: 0.7;
+  }
+  35% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes loop-in {
+  from {
+    opacity: 0;
+    translate: 0 70%;
+    filter: blur(3px);
+  }
+}
+@keyframes drift {
+  50% {
+    translate: 0 -5px;
+  }
+}
+@keyframes bubble {
+  from {
+    opacity: 0;
+    scale: 0.3;
+    translate: 0 16px;
   }
 }
 @keyframes draw-x {
@@ -401,5 +608,9 @@
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .lattice > i {
+    opacity: 0.7 !important;
+    scale: 1 !important;
   }
 }

@@ -135,3 +135,6 @@ export const REHEARSAL_ENGINE: Record<RehearsalResult['engine'], StatusLabel> = 
   'swarm-offline': { label: 'Offline estimate', tone: 'partial' },
   mirofish: { label: 'MiroFish', tone: 'supported' },
 };
+
+/** How a draft is laid out. */
+export const FORMAT: Record<'post' | 'thread', string> = { post: 'Single post', thread: 'Thread' };

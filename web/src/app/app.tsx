@@ -1,3 +1,4 @@
+import { BubbleMenu } from '@/components/shared/motion/bubble-menu';
 import { lazy, Suspense, type CSSProperties } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -68,6 +69,7 @@ export function App() {
       <CaptureSheet open={overlay === 'capture'} onOpenChange={toggle('capture')} />
       <CommandMenu open={overlay === 'command'} onOpenChange={toggle('command')} />
       <ShortcutsDialog open={overlay === 'shortcuts'} onOpenChange={toggle('shortcuts')} />
+      <BubbleMenu />
     </SidebarProvider>
   );
 }

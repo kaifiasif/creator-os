@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TextLoop } from '@/components/shared/motion/text-loop';
 import { Spinner } from '@/components/ui/spinner';
 
 /** A typical draft and its checks take about this long; the bar never claims to be done. */
@@ -24,6 +25,9 @@ export function GeneratingState({ createdAt }: { createdAt: string }) {
         <CardTitle className="flex items-center gap-2">
           <Spinner /> Writing your draft
         </CardTitle>
+        <p className="thought-line text-sm font-medium">
+          <TextLoop words={['Reading your claims', 'Drafting in your voice', 'Checking every sentence against the source', 'Comparing with your archive']} interval={2600} />
+        </p>
         <CardDescription>Drafting from your claims, then checking every sentence against the source and your archive. This page updates on its own.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5">

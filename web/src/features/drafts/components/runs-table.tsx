@@ -3,9 +3,8 @@ import { navigate } from '@/app/router';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDate, formatRelative } from '@/lib/format';
-import { RUN_STATUS } from '@/lib/labels';
+import { FORMAT, RUN_STATUS } from '@/lib/labels';
 
-const FORMAT: Record<RunSummary['format'], string> = { post: 'Single post', thread: 'Thread' };
 
 export function RunsTable({ runs, emptyText }: { runs: RunSummary[]; emptyText: string }) {
   return (

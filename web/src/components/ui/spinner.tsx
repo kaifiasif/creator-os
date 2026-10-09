@@ -1,14 +1,13 @@
 import { cn } from "@/lib/utils"
-import { Loader2Icon } from "lucide-react"
 
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
+/** The app's loading indicator: a 3×3 lattice of dots rippling corner to corner (styles in index.css). */
+function Spinner({ className, ...props }: React.ComponentProps<"span">) {
   return (
-    <Loader2Icon
-      role="status"
-      aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
-      {...props}
-    />
+    <span role="status" aria-label="Loading" className={cn("lattice size-4", className)} {...props}>
+      {Array.from({ length: 9 }, (_, i) => (
+        <i key={i} />
+      ))}
+    </span>
   )
 }
 

@@ -12,6 +12,7 @@ import { useRuns } from './api';
 import { DRAFT_FILTERS, type DraftFilter } from './components/draft-filters';
 import { DraftStats } from './components/draft-stats';
 import { DraftsSkeleton } from './components/drafts-skeleton';
+import { ReviewQueue } from './components/review-queue';
 import { RunsTable } from './components/runs-table';
 
 const EMPTY_TEXT: Record<DraftFilter, string> = {
@@ -40,6 +41,7 @@ function DraftsBody({ runs }: { runs: RunList }) {
   return (
     <>
       <DraftStats runs={runs} />
+      <ReviewQueue runs={runs.filter(DRAFT_FILTERS[0].test)} />
       <Tabs value={filter} onValueChange={(v) => setFilter(v as DraftFilter)}>
         <TabsList className="max-w-full justify-start overflow-x-auto">
           {DRAFT_FILTERS.map((f) => (

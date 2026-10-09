@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { AuthSession } from '@/api/types';
 import { LogoMark } from '@/components/shared/logo-mark';
 import { LoginForm } from './components/login-form';
+import { TextLoop } from '@/components/shared/motion/text-loop';
 import { ProofDemo } from './components/proof-demo';
 import { SignupForm } from './components/signup-form';
 
@@ -27,9 +28,15 @@ export function AuthPage({ session }: { session: AuthSession }) {
   return (
     <main className="grid min-h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="motion-rise flex items-center gap-2 font-medium">
-          <LogoMark className="size-6" />
-          Creator OS
+        <div className="motion-rise flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-medium">
+            <LogoMark className="size-6" />
+            Creator OS
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Posts from your{' '}
+            <TextLoop words={['voice memos', 'calls', 'notes', 'old threads']} className="font-medium text-foreground" />, checked.
+          </p>
         </div>
         <div className="flex flex-1 items-center justify-center">
           {/* keyed by mode, so switching between log in and sign up replays the short entrance */}

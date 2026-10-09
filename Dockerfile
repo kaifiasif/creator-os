@@ -15,10 +15,13 @@ COPY public ./public
 COPY scripts ./scripts
 COPY fixtures ./fixtures
 COPY openapi.yaml ./
+COPY docker-entrypoint.sh /usr/local/bin/
 
 RUN mkdir -p data && chown node:node data
-USER node
 
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=4173
 EXPOSE 4173
+VOLUME ["/app/data"]
+# Starts as root only to hand a freshly mounted disk to the node user, then runs the app as node.
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "--no-warnings", "src/main.ts"]

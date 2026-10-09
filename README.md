@@ -45,6 +45,7 @@ How the web code is organised:
 - `web/src/api/`: a typed client generated from the server's own route types (Hono RPC), so the web app and API cannot drift apart.
 - `web/src/components/ui/` (shadcn), `components/shared/` (page header, stat card, status badge, empty and error states), `components/layout/` (sidebar, header).
 - `web/src/lib/labels.ts`: every user-facing name for a server value, in one place.
+- Motion: all of it is CSS in `web/src/index.css` (`motion-enter`, `motion-rise`, `motion-pop`, `proof-*`). Each screen has one short staggered entrance, proof marks draw in when checks arrive, buttons press in. Nothing loops, and with reduced motion turned on everything shows its final state at once.
 
 Keyboard:
 
@@ -67,7 +68,7 @@ Screens:
 - **Audience** (a tab on a decided draft): rehearses the post with 12 simulated followers over 10 rounds, then shows likes, replies, pushback and which sentences people reacted to. It uses the same `LLM_API_KEY` (Groq by default); without a key it shows a labelled rule-based estimate.
 - **Archive**: your posts, import with a preview, retire and restore, and calibration of the repeat threshold.
 - **Results**: acceptance with and without checks, rejections, flags, agents, drift and the run table with CSV export. Locked until every draft in review has a decision.
-- **Log in** and **sign up**: every creator has their own account and sees only their own data. The first account takes over anything already in the database.
+- **Log in** and **sign up**: every creator has their own account and sees only their own data. The first account takes over anything already in the database. On wide screens the right half plays a short demo once: a draft from a voice memo getting its proof marks, and the Reviewer striking the invented number.
 - **Settings**: your account (password, log out), optional 2-step codes, agents, theme, and which providers are active.
 
 ## Providers: works offline, better with keys

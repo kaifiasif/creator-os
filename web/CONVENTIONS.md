@@ -30,4 +30,4 @@ src/
 - **Labels in one place.** Every user-facing name for a server enum lives in `@/lib/labels`.
 - **Copy:** sentence case, plain verbs, a button says what it does ("Accept draft", not "Submit"). No all-caps labels, no "A · B" meta strings, no arrows in button text. Plurals are always correct (`plural()` in `@/lib/format`).
 - **Accessibility:** every icon-only button has an `aria-label`; keyboard focus is always visible; layouts work at 375px wide.
-- **Motion** only answers an action (opening, confirming). No decorative entrance animations.
+- **Motion** lives in `index.css` (`motion-enter`, `motion-rise`, `motion-pop`, `proof-*`), never in a component. It answers an action (opening, confirming, a check arriving), plus one short staggered entrance per screen and the log-in demo, which plays once. Nothing loops, and `prefers-reduced-motion` skips every animation to its last frame.

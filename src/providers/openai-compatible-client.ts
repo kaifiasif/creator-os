@@ -15,7 +15,7 @@ export function createOpenAiCompatibleComplete(options: { baseUrl: string; apiKe
     withRetry(async () => {
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'creator-os/0.7.2', authorization: `Bearer ${options.apiKey}` },
+        headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'creator-os/0.7.3', authorization: `Bearer ${options.apiKey}` },
         body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'system', content: system }, ...messages] }),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });

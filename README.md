@@ -167,7 +167,8 @@ Not built: blind voice test (FR-013), LinkedIn adapter (FR-016, out of scope by 
 
 It is one service: `npm start` runs the web app, which starts the Python agents next to it. The host needs Node 22.18+ and Python 3.10+, and a disk for `data/`.
 
-- **Any host with Docker** (Render, Fly.io, Railway, a VPS): the included `Dockerfile` has both. Mount a persistent disk at `/app/data`.
+- **Render** (set up in `render.yaml`): in Render choose **New > Blueprint** and pick this repo. It builds the `Dockerfile` on the Starter plan with a 1 GB disk at `/app/data`, checks `/api/health`, and sets `NODE_ENV`, `HOST`, `TRUST_PROXY=1` and closed sign-up for you. It asks for `CREATOR_OS_OWNER_EMAIL` (the email you will sign up with) and the provider keys you want; leave any key blank to skip it.
+- **Any other host with Docker** (Fly.io, Railway, a VPS): the included `Dockerfile` has both. Mount a persistent disk at `/app/data`; the entrypoint hands a root-owned disk to the `node` user before the app starts.
 - **A host with Node and Python already installed**: build command `npm ci --omit=dev`, start command `npm start`.
 
 Set `NODE_ENV=production`, `HOST=0.0.0.0`, `TRUST_PROXY=1` behind Render or Fly, `CREATOR_OS_OWNER_EMAIL` if you bring an existing database, and the provider keys you want (`LLM_API_KEY` for Groq's free tier). The agents service needs no port of its own and is never reachable from outside: it listens on 127.0.0.1 only.

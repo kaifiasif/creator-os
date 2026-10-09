@@ -22,6 +22,10 @@ class AnthropicClient(Protocol):
 
 
 MAX_WAIT_S = 20
+# Cloudflare in front of Groq (and others) blocks Python's default "Python-urllib/3.x" agent with
+# 403 "error code: 1010", so every outbound request names itself.
+USER_AGENT = "creator-os-agents/0.7.2"
+BASE_HEADERS = {"content-type": "application/json", "accept": "application/json", "user-agent": USER_AGENT}
 
 
 class ProviderError(RuntimeError):
@@ -37,6 +41,14 @@ def retry_after(error: urllib.error.HTTPError) -> float | None:
         return min(float(error.headers.get("retry-after", "")), MAX_WAIT_S)
     except (TypeError, ValueError):
         return None
+
+
+def blocked_message(vendor: str, detail: str) -> str | None:
+    """A 403 from the provider's edge rather than the API (Cloudflare 1010/1020), in words the creator can act on."""
+    if "1010" in detail or "1020" in detail or "cloudflare" in detail.lower():
+        code = detail.strip().strip('"')[:40]
+        return f"{vendor} blocked the request at its firewall (403, {code}). This is not a key problem: the provider's firewall refused this server. If it keeps happening, run from another network or host."
+    return None
 
 
 def rate_limit_message(vendor: str, status: int) -> str:
@@ -87,7 +99,7 @@ class HttpAnthropicClient:
                 API_URL,
                 data=body,
                 method="POST",
-                headers={"content-type": "application/json", "x-api-key": self._api_key, "anthropic-version": "2023-06-01"},
+                headers={**BASE_HEADERS, "x-api-key": self._api_key, "anthropic-version": "2023-06-01"},
             )
             try:
                 with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT_S) as res:
@@ -96,6 +108,8 @@ class HttpAnthropicClient:
                 detail = error.read()[:300].decode("utf-8", "replace")
                 if error.code == 429:
                     raise ProviderError(rate_limit_message("Anthropic", 429), retryable=True, wait_s=retry_after(error)) from error
+                if error.code == 403 and (blocked := blocked_message("Anthropic", detail)):
+                    raise ProviderError(blocked, retryable=False) from error
                 retryable = error.code >= 500 or error.code == 408
                 raise ProviderError(f"Anthropic {error.code}: {detail}", retryable) from error
 

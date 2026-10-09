@@ -44,7 +44,7 @@ export function swarmLlm({
       try {
         res = await fetchImpl(url, {
           method: 'POST',
-          headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+          headers: { 'content-type': 'application/json', accept: 'application/json', 'user-agent': 'creator-os/0.7.2', authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({ model, messages, temperature, max_tokens: maxTokens, response_format: { type: 'json_object' } }),
           signal: AbortSignal.timeout(timeoutMs),
         });

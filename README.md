@@ -88,7 +88,7 @@ Screens:
 | `CREATOR_OS_PYTHON` | The Python the agents run on, for example `python3.12` or a full path | `python3` |
 | `CREATOR_OS_AGENTS_URL`, `AGENTS_SERVICE_TOKEN` | Use an agents service you started yourself (`npm run agents` with the same token) on the same machine, for example to debug it | The app starts and stops the agents service itself |
 
-The Reviewer, Scorer and Decision agents use tool calling on whichever model is set: Claude first, then the `LLM_API_KEY` model. With neither, they run their local rule versions. Free plans allow only a few requests a minute; when the limit is hit the agent waits and retries twice, and if it is still limited it fails with a message saying to wait a minute and use "Run agents again".
+The Reviewer, Scorer and Decision agents use tool calling on whichever model is set: Claude first, then the `LLM_API_KEY` model. With neither, they run their local rule versions. Free plans allow only a few requests a minute; when the limit is hit the agent waits and retries twice, and if it is still limited it fails with a message saying to wait a minute and use "Run agents again". A `403 ... error code: 1010` means the provider's firewall refused the request rather than the key; every request names itself with a `creator-os` user agent, which Groq's firewall requires since v0.7.2.
 
 Third-party calls only happen for the keys you set. Calls with other people require ticking a consent box before they are processed.
 

@@ -1,0 +1,35 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# One Docker web service (Node app + Python agents) with a persistent disk for
+# the SQLite database and uploads. Apply it from Render: New > Blueprint.
+services:
+  - type: web
+    name: creator-os
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter # persistent disks need a paid instance
+    region: oregon
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: creator-os-data
+      mountPath: /app/data # data/creator-os.db and data/uploads
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY # rate limits per visitor, not per Render proxy
+        value: "1"
+      - key: CREATOR_OS_SIGNUP # only the owner's account can be created
+        value: closed
+      - key: CREATOR_OS_OWNER_EMAIL # the email you will sign up with
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: LLM_API_KEY # Groq free tier, used when ANTHROPIC_API_KEY is empty
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ASSEMBLYAI_API_KEY
+        sync: false

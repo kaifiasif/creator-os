@@ -8,7 +8,7 @@ import { TONE_DOT } from './tone';
 export function StatusBadge({ status, className }: { status: StatusLabel; className?: string }) {
   return (
     <Badge variant="outline" className={cn('gap-1.5 text-muted-foreground', className)}>
-      {status.busy ? <Spinner className="size-3" /> : <span aria-hidden className={cn('size-1.5 rounded-full', TONE_DOT[status.tone])} />}
+      {status.busy ? <Spinner className="size-3" /> : <span key={status.tone} aria-hidden className={cn('motion-pop size-1.5 rounded-full', TONE_DOT[status.tone])} />}
       {status.label}
     </Badge>
   );

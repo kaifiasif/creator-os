@@ -2,6 +2,10 @@
 
 Turns your raw material (voice memo transcripts, call transcripts, rough notes) into X posts and threads, and treats your published archive as a **standard every draft must pass** rather than examples it copies. Built from `creator_os_PRD.md` v1.0.
 
+![Creator OS sign-up page: an account form beside a live claim check, where an invented number is struck and a near-repeat of an old post is flagged](docs/screenshots/demo-cover.jpg)
+
+The opening frame of the 2 minute 32 second feature demo (sign-up, capture, angles, sentence checks, publishing, agents, audience rehearsal, Results, Archive, shortcuts, Settings and log out).
+
 ## Run it
 
 Needs Node 22.18 or newer (it runs the TypeScript source directly, no build step for the server) and Python 3.10 or newer for the agents (standard library only, nothing to `pip install`).

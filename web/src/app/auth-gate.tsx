@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useSession } from '@/features/auth/api';
 import { AuthPage } from '@/features/auth/auth-page';
+import { markFarewell } from '@/features/auth/farewell';
 
 /** Renders the app only for a signed-in creator; everyone else gets the log-in screen. */
 export function AuthGate({ children }: { children: ReactNode }) {
@@ -21,6 +22,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       whenSignedOut(() => {
         const current = client.getQueryData<AuthSession>(queryKeys.session);
         if (!current?.user) return;
+        markFarewell('expired');
         client.removeQueries({ predicate: (q) => q.queryKey[0] !== queryKeys.session[0] });
         client.setQueryData<AuthSession>(queryKeys.session, { ...current, user: null });
         toast.info('You were logged out. Log in again to carry on.');

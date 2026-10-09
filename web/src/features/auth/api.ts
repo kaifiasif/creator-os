@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/api/client';
 import { queryKeys } from '@/api/query-client';
 import type { AuthSession, PublicUser } from '@/api/types';
+import { markFarewell } from './farewell';
 
 /** Who is signed in, and whether this server takes new accounts. Never fails with 401. */
 export function useSession() {
@@ -15,6 +16,7 @@ export function useSession() {
 function useSignedIn() {
   const client = useQueryClient();
   return (user: PublicUser | null) => {
+    if (user) markFarewell(null);
     client.removeQueries({ predicate: (q) => q.queryKey[0] !== queryKeys.session[0] });
     client.setQueryData<AuthSession>(queryKeys.session, (prev) => ({ signup_open: prev?.signup_open ?? false, first_account: false, existing_data: false, user }));
   };
@@ -38,7 +40,13 @@ export function useSignup() {
 
 export function useLogout() {
   const signedIn = useSignedIn();
-  return useMutation({ mutationFn: () => unwrap(api.auth.logout.$post()), onSettled: () => signedIn(null) });
+  return useMutation({
+    mutationFn: () => unwrap(api.auth.logout.$post()),
+    onSettled: () => {
+      markFarewell('logged-out');
+      signedIn(null);
+    },
+  });
 }
 
 export function useChangePassword() {

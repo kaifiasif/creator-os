@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { CaptureSheet } from '@/features/sources/capture/capture-sheet';
 import { InboxPage } from '@/features/sources/inbox-page';
+import { NotFoundPage } from '@/components/layout/not-found-page';
 import { startLeader, useHotkey } from '@/hooks/use-hotkey';
 import { CommandMenu } from './command-menu';
 import { navigate, useRoute, type Route } from './router';
@@ -34,6 +35,8 @@ function CurrentScreen({ route }: { route: Route }) {
       return <ResultsPage />;
     case 'settings':
       return <SettingsPage />;
+    case 'missing':
+      return <NotFoundPage />;
   }
 }
 

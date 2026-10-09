@@ -8,7 +8,8 @@ export type Route =
   | { name: 'review'; id: string }
   | { name: 'archive' }
   | { name: 'results' }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'missing' };
 
 const PATTERNS: [RegExp, (m: RegExpMatchArray) => Route][] = [
   [/^\/sources\/([\w-]+)$/, (m) => ({ name: 'source', id: m[1] })],
@@ -17,6 +18,7 @@ const PATTERNS: [RegExp, (m: RegExpMatchArray) => Route][] = [
   [/^\/archive$/, () => ({ name: 'archive' })],
   [/^\/results$/, () => ({ name: 'results' })],
   [/^\/settings$/, () => ({ name: 'settings' })],
+  [/^\/?$/, () => ({ name: 'inbox' })],
 ];
 
 export function parseRoute(hash: string): Route {
@@ -25,7 +27,7 @@ export function parseRoute(hash: string): Route {
     const match = path.match(pattern);
     if (match) return build(match);
   }
-  return { name: 'inbox' };
+  return { name: 'missing' };
 }
 
 export function pathOf(route: Route): string {

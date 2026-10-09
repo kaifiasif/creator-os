@@ -4,11 +4,20 @@ import { LogoMark } from '@/components/shared/logo-mark';
 import { LoginForm } from './components/login-form';
 import { TextLoop } from '@/components/shared/motion/text-loop';
 import { ProofDemo } from './components/proof-demo';
+import { Mascot } from '@/components/shared/mascot/mascot';
+import { StickerPile } from '@/components/shared/mascot/sticker-pile';
+import { readFarewell, type Farewell } from './farewell';
 import { SignupForm } from './components/signup-form';
 
 type Mode = 'login' | 'signup';
 
-function intro(mode: Mode, session: AuthSession) {
+const GOODBYE: Record<NonNullable<Farewell>, { title: string; description: string }> = {
+  'logged-out': { title: 'You are logged out', description: 'Your archive, sources and drafts are saved. Log in again whenever you are ready.' },
+  expired: { title: 'Your session ended', description: 'You were logged out, but nothing was lost. Log in again to carry on where you left off.' },
+};
+
+function intro(mode: Mode, session: AuthSession, farewell: Farewell) {
+  if (mode === 'login' && farewell) return GOODBYE[farewell];
   if (mode === 'login') return { title: 'Log in', description: 'Your archive, sources and drafts are only visible to you.' };
   if (session.existing_data) {
     return { title: 'Create the first account', description: 'This server already has an archive and drafts. The first account takes them over; later accounts start empty.' };
@@ -23,7 +32,9 @@ function intro(mode: Mode, session: AuthSession) {
  */
 export function AuthPage({ session }: { session: AuthSession }) {
   const [mode, setMode] = useState<Mode>(session.first_account ? 'signup' : 'login');
-  const { title, description } = intro(mode, session);
+  // read once: after a log-out the screen says goodbye; a reload is a fresh visit and gets the demo
+  const [farewell] = useState(readFarewell);
+  const { title, description } = intro(mode, session, farewell);
 
   return (
     <main className="grid min-h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
@@ -41,6 +52,7 @@ export function AuthPage({ session }: { session: AuthSession }) {
         <div className="flex flex-1 items-center justify-center">
           {/* keyed by mode, so switching between log in and sign up replays the short entrance */}
           <div key={mode} className="motion-enter flex w-full max-w-sm flex-col gap-6">
+            {farewell && <Mascot pose="sleep" label className="sticker sticker-in size-20 [--tilt:-6deg] lg:hidden" />}
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
               <p className="text-balance text-muted-foreground">{description}</p>
@@ -56,9 +68,18 @@ export function AuthPage({ session }: { session: AuthSession }) {
           </div>
         </div>
       </div>
-      <aside aria-label="How drafts are checked" className="relative hidden items-center justify-center overflow-hidden border-l bg-muted p-10 lg:flex xl:p-16">
-        <ProofDemo />
-      </aside>
+      {farewell ? (
+        <aside aria-label="See you soon" className="relative hidden flex-col items-center justify-center gap-10 overflow-hidden border-l bg-muted p-10 lg:flex xl:p-16">
+          <StickerPile className="max-w-md" />
+          <p className="motion-rise max-w-sm text-center text-2xl font-semibold tracking-tight text-balance" style={{ animationDelay: '0.9s' }}>
+            See you soon. Blot will keep your drafts warm.
+          </p>
+        </aside>
+      ) : (
+        <aside aria-label="How drafts are checked" className="relative hidden items-center justify-center overflow-hidden border-l bg-muted p-10 lg:flex xl:p-16">
+          <ProofDemo />
+        </aside>
+      )}
     </main>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
+import { Mascot } from '@/components/shared/mascot/mascot';
 import { toast } from 'sonner';
 import { errorMessage, isApiError } from '@/api/errors';
 import type { DecisionInput, DecisionResult, Override, RejectReason, RunView } from '@/api/types';
@@ -38,7 +39,7 @@ function readUnresolved(details: Record<string, unknown> | undefined): Unresolve
 
 function announce(result: DecisionResult) {
   if (result.decision === 'reject') return toast('Rejected. The reason is saved with your results.');
-  if (result.recheck_status === 'clean') return toast.success('Accepted. The final text passed every check.');
+  if (result.recheck_status === 'clean') return toast.success('Accepted. The final text passed every check.', { icon: createElement(Mascot, { pose: 'stamp', className: 'size-7' }) });
   if (result.recheck_status === 'gate_failed') return toast.warning('Accepted, but the checks could not run on the final text. Run them again before publishing.');
   return toast.warning('Accepted, but the final text has flags to resolve before publishing.');
 }

@@ -4,4 +4,3 @@ uploads/
 *.db*
 web/node_modules/
 __pycache__/
-*.tsbuildinfo

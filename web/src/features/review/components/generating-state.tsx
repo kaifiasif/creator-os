@@ -29,9 +29,9 @@ export function GeneratingState({ createdAt }: { createdAt: string }) {
       <CardContent className="grid gap-5">
         <Progress value={Math.min(90, (elapsed / TYPICAL_MS) * 100)} aria-label="Drafting progress" />
         <div className="grid gap-2">
-          <Skeleton className="h-4 w-11/12" />
-          <Skeleton className="h-4 w-4/5" />
-          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="ink-sweep h-4 w-11/12" />
+          <Skeleton className="ink-sweep h-4 w-4/5" />
+          <Skeleton className="ink-sweep h-4 w-1/2" />
         </div>
       </CardContent>
     </Card>

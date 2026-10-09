@@ -45,7 +45,7 @@ export function SiteHeader({ crumbs, actions }: { crumbs: Crumb[]; actions?: Rea
             <Kbd>⌘K</Kbd>
           </Button>
           <Button variant="ghost" size="icon" className="size-8" onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')} aria-label="Toggle dark mode">
-            {resolved === 'dark' ? <SunIcon /> : <MoonIcon />}
+            {resolved === 'dark' ? <SunIcon key="sun" className="motion-turn" /> : <MoonIcon key="moon" className="motion-turn" />}
           </Button>
         </div>
       </div>

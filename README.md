@@ -45,7 +45,7 @@ How the web code is organised:
 - `web/src/api/`: a typed client generated from the server's own route types (Hono RPC), so the web app and API cannot drift apart.
 - `web/src/components/ui/` (shadcn), `components/shared/` (page header, stat card, status badge, empty and error states), `components/layout/` (sidebar, header).
 - `web/src/lib/labels.ts`: every user-facing name for a server value, in one place.
-- Motion: all of it is CSS in `web/src/index.css` (`motion-enter`, `motion-rise`, `motion-pop`, `proof-*`). Each screen has one short staggered entrance, proof marks draw in when checks arrive, buttons press in. Nothing loops, and with reduced motion turned on everything shows its final state at once.
+- Look and motion: an editor's desk. Cool paper and blue-black ink (a navy night desk in dark mode), with the editor's blue pencil as the one brand colour. Each screen sits on faint ruled lines, its title gets a pencil tick, headline numbers count up, table rows cascade in, the active nav item and hovered rows get a pencil mark in the margin, selected sentences get a pencil sweep, and proof marks draw in when checks arrive. All of it is CSS in `web/src/index.css` plus a small `CountUp` component; with reduced motion turned on everything shows its final state at once.
 
 Keyboard:
 

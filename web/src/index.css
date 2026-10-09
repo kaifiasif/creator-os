@@ -30,6 +30,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.91 0.004 75);
   --input: oklch(0.89 0.005 75);
+  --autofill: var(--background);
   --ring: oklch(0.55 0.01 65);
   --chart-1: oklch(0.82 0.01 70);
   --chart-2: oklch(0.66 0.012 65);
@@ -70,6 +71,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 13%);
+  --autofill: color-mix(in oklch, var(--card), white 4%);
   --ring: oklch(0.6 0.01 70);
   --chart-1: oklch(0.88 0.01 75);
   --chart-2: oklch(0.74 0.012 70);
@@ -156,6 +158,43 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'ss01', 'cv11';
   }
+  /* Native parts (scrollbars, checkboxes, autofill) follow the app's theme, not the system's, and use ink. */
+  :root {
+    color-scheme: light;
+    accent-color: var(--primary);
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  /* Selected text is a soft stone tint everywhere, instead of the browser's blue. */
+  ::selection {
+    background-color: color-mix(in oklch, var(--foreground) 16%, transparent);
+    color: var(--foreground);
+  }
+}
+
+/*
+ * Browser autofill paints saved emails and passwords with its own grey-blue, both when a field is filled and
+ * while you hover a suggestion. That colour is `!important` in the browser's sheet, so it is covered with an
+ * inset shadow in the field's own colour (keeping the focus ring) and its fade-in is pushed out of reach.
+ * Unlayered on purpose: it has to win over the input's shadow and ring utilities, which it then repeats.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill,
+input:autofill {
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+  box-shadow:
+    inset 0 0 0 100vmax var(--autofill),
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow, 0 0 #0000);
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
 }
 
 /*

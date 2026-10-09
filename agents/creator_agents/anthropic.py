@@ -27,7 +27,7 @@ class AnthropicClient(Protocol):
 MAX_WAIT_S = 60
 # Cloudflare in front of Groq (and others) blocks Python's default "Python-urllib/3.x" agent with
 # 403 "error code: 1010", so every outbound request names itself.
-USER_AGENT = "creator-os-agents/0.9.0"
+USER_AGENT = "creator-os-agents/0.9.1"
 BASE_HEADERS = {"content-type": "application/json", "accept": "application/json", "user-agent": USER_AGENT}
 
 

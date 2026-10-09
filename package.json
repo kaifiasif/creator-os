@@ -1,0 +1,34 @@
+{
+  "name": "creator-os",
+  "version": "0.7.1",
+  "description": "Turns raw material into X posts that must pass the creator's own archive before review.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node --no-warnings src/main.ts",
+    "dev": "node --no-warnings --watch src/main.ts",
+    "seed": "node --no-warnings scripts/seed.ts",
+    "db:reset": "rm -f data/creator-os.db data/creator-os.db-wal data/creator-os.db-shm && npm run seed",
+    "test": "npm run test:node && npm run test:py",
+    "typecheck": "tsc --noEmit -p .",
+    "check": "npm run typecheck && npm test",
+    "build:web": "cd web && npm install && npm run build",
+    "dev:web": "cd web && npm run dev",
+    "test:node": "node --no-warnings --test test/*.test.ts",
+    "test:py": "cd agents && python3 -m unittest discover -s tests -t .",
+    "agents": "cd agents && python3 -m creator_agents"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.3",
+    "@hono/zod-validator": "^0.9.1",
+    "hono": "^4.13.13",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^7.0.2"
+  }
+}

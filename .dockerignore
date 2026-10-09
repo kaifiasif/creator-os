@@ -1,0 +1,7 @@
+.git
+node_modules
+web/node_modules
+data
+uploads
+**/__pycache__
+*.db*

@@ -1,0 +1,6 @@
+node_modules/
+data/
+uploads/
+*.db*
+web/node_modules/
+__pycache__/

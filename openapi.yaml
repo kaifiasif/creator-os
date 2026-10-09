@@ -1,0 +1,911 @@
+openapi: 3.1.0
+info:
+  title: Creator OS API
+  version: 0.7.1
+  description: |
+    Turns one creator's raw material into X posts that must pass the creator's own archive before review.
+    Implements PRD v1.0 sections 6 and 9.
+
+    Accounts: sign up or log in under /api/auth; the server sets an HttpOnly session cookie. Every other
+    endpoint except /api/health needs that cookie and sees only the signed-in creator's data. An id that
+    belongs to another account answers 404, exactly like one that does not exist.
+
+    The agents run in an internal Python service (agents/) that only this server can reach. It is not part
+    of this API; agent results appear on the run as before, in the same shape.
+
+    Every error returns `{ "error": { "code", "message", "details"? } }`. Branch on `code`, which is stable:
+    VALIDATION_FAILED (400, `details.fields` lists each bad field), UNAUTHORIZED (401: not logged in, or wrong email or password),
+    MFA_REQUIRED (401: right password, now send `code`), WRONG_CREDENTIALS (400: a re-entered password or code was wrong),
+    ACCOUNT_EXISTS (409), SIGNUP_CLOSED (403), FORBIDDEN (403: a write from another site), NOT_FOUND (404),
+    PAYLOAD_TOO_LARGE (413), UNSUPPORTED_FILE (400), CONSENT_REQUIRED (422), DUPLICATE_SOURCE (409, `details.existing_source_item_id`),
+    INVALID_STATE (409), UNRESOLVED_FLAGS (409, `details.unresolved`), TEXT_CHANGED (409), METRICS_LOCKED (409),
+    RULE_VIOLATION (422), RATE_LIMITED (429, `details.retry_after_s` and a Retry-After header), INTERNAL (500, `details.request_id`).
+
+    Experiment rules enforced by the API:
+    - A run's `condition` (gate | context_only) is never returned before a decision exists on its draft.
+    - Under `context_only`, sentence checks run and are stored but are withheld (`checks: null`) until the decision.
+    - Metrics endpoints are locked while any draft awaits a decision (prevents anchoring).
+    - Any check that cannot run yields `gate_failed`; such drafts cannot be accepted (fail closed).
+    - The system never calls the X API; publishing is copy or an x.com compose link after a typed `POST`.
+servers:
+  - url: http://localhost:4173
+security:
+  - session: []
+tags:
+  - name: Auth
+  - name: Archive
+  - name: Sources
+  - name: Runs
+  - name: Drafts
+  - name: Metrics
+  - name: Calibration
+  - name: Agents
+
+paths:
+  /api/auth/session:
+    get:
+      tags: [Auth]
+      summary: Who is logged in, and whether sign-up is open. Never 401.
+      security: []
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, signup_open, first_account, existing_data]
+                properties:
+                  user: { oneOf: [{ $ref: '#/components/schemas/User' }, { type: 'null' }] }
+                  signup_open: { type: boolean }
+                  first_account: { type: boolean, description: No account exists yet }
+                  existing_data: { type: boolean, description: The next sign-up takes over data from before accounts }
+  /api/auth/signup:
+    post:
+      tags: [Auth]
+      summary: Create an account and log in. The first account takes over data from before accounts.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 10, maxLength: 200 }
+      responses:
+        '201': { description: Created; sets the session cookie, content: { application/json: { schema: { $ref: '#/components/schemas/UserEnvelope' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in. Accounts with 2-step codes on answer MFA_REQUIRED until `code` is sent too.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                code: { type: string, pattern: '^\\d{6}$' }
+      responses:
+        '200': { description: Logged in; sets the session cookie, content: { application/json: { schema: { $ref: '#/components/schemas/UserEnvelope' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: End this session and clear the cookie.
+      security: []
+      responses:
+        '200': { description: Logged out }
+  /api/auth/password:
+    post:
+      tags: [Auth]
+      summary: Change the password. Ends every other session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password]
+              properties:
+                current_password: { type: string }
+                new_password: { type: string, minLength: 10, maxLength: 200 }
+      responses:
+        '200': { description: Changed }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/auth/mfa/setup:
+    post:
+      tags: [Auth]
+      summary: Start turning on 2-step codes. Returns a new secret and the otpauth link for a QR code.
+      responses:
+        '200':
+          description: Pending secret
+          content: { application/json: { schema: { type: object, properties: { secret: { type: string }, otpauth_uri: { type: string } } } } }
+        '409': { $ref: '#/components/responses/Error' }
+  /api/auth/mfa/enable:
+    post:
+      tags: [Auth]
+      summary: Turn on 2-step codes with a code from the app.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string } } } } } }
+      responses:
+        '200': { description: On, content: { application/json: { schema: { $ref: '#/components/schemas/UserEnvelope' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/auth/mfa/disable:
+    post:
+      tags: [Auth]
+      summary: Turn off 2-step codes. Needs the password and a code.
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [password, code], properties: { password: { type: string }, code: { type: string } } } } } }
+      responses:
+        '200': { description: Off, content: { application/json: { schema: { $ref: '#/components/schemas/UserEnvelope' } } } }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/config:
+    get:
+      operationId: getConfig
+      summary: Which providers are active (local fallback or hosted)
+      responses:
+        '200':
+          description: Provider names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  llm: { type: string, examples: [anthropic, local] }
+                  models: { type: object, additionalProperties: { type: string } }
+                  embeddings: { type: string }
+                  transcription: { type: string }
+                  audio_supported: { type: boolean }
+                  auth: { type: boolean }
+
+  /api/archive/preview:
+    post:
+      operationId: previewArchive
+      tags: [Archive]
+      summary: Parse an import without saving it, so every row can be reviewed first.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format: { type: string, enum: [x_export, csv, paste], default: paste }
+                include_replies: { type: boolean, default: false }
+                raw: { type: string }
+      responses:
+        '200':
+          description: Rows after thread grouping, plus what was left out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        external_id: { type: string }
+                        text: { type: string }
+                        parts: { type: [array, 'null'], items: { type: string } }
+                        published_at: { type: string, format: date-time }
+                        url: { type: [string, 'null'] }
+                        status: { type: string, enum: [new, exists] }
+                        kind: { type: string, enum: [post, thread] }
+                  excluded:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        external_id: { type: string }
+                        text: { type: string }
+                        reason: { type: string, enum: [retweet, reply] }
+                  counts:
+                    type: object
+                    properties:
+                      rows: { type: integer }
+                      new: { type: integer }
+                      exists: { type: integer }
+                      threads: { type: integer }
+                      excluded: { type: integer }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/archive/import:
+    post:
+      operationId: importArchive
+      tags: [Archive]
+      summary: Import published posts (FR-002). Idempotent by external_id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format: { type: string, enum: [x_export, csv, paste], default: paste }
+                include_replies: { type: boolean, default: false }
+                raw: { type: string, description: 'tweets.js contents, CSV with a text column, or pasted posts separated by --- or blank lines' }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [text]
+                    properties:
+                      external_id: { type: string }
+                      text: { type: string }
+                      published_at: { type: string, format: date-time }
+                      url: { type: string }
+                      in_reply_to: { type: string, description: 'external_id of the parent, used to group threads' }
+                only:
+                  type: array
+                  items: { type: string }
+                  description: 'Import only these pieces (external_id of each root post, as returned by the preview)'
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imported: { type: integer }
+                  skipped_existing: { type: integer }
+                  threads_grouped: { type: integer }
+                  excluded: { type: integer }
+                  holdout: { type: integer }
+                  total_pieces: { type: integer }
+                  warning: { type: [string, 'null'] }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+
+  /api/archive:
+    get:
+      operationId: listArchive
+      tags: [Archive]
+      summary: List archive pieces and index stats
+      responses:
+        '200':
+          description: Archive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total: { type: integer }
+                  holdout: { type: integer }
+                  retired: { type: integer }
+                  below_prerequisite: { type: boolean }
+                  embedding_provider: { type: string }
+                  repetition_threshold: { type: number }
+                  pieces: { type: array, items: { $ref: '#/components/schemas/ArchivePiece' } }
+
+  /api/archive/{id}/retire:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: retireArchivePiece
+      tags: [Archive]
+      summary: Retire an angle (FR-010). Future matches flag at high severity.
+      requestBody: { $ref: '#/components/requestBodies/Reason' }
+      responses:
+        '200': { description: 'Retired', content: { application/json: { schema: { type: object, properties: { id: { type: string }, retired: { type: boolean } } } } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: unretireArchivePiece
+      tags: [Archive]
+      summary: Un-retire an archive piece
+      responses:
+        '200': { description: 'Un-retired' }
+
+  /api/claims/{id}/retire:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: retireClaim
+      tags: [Archive]
+      summary: Retire a claim as an angle you are done saying
+      requestBody: { $ref: '#/components/requestBodies/Reason' }
+      responses:
+        '200': { description: 'Retired' }
+        '404': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+
+  /api/sources:
+    get:
+      operationId: listSources
+      tags: [Sources]
+      summary: List source items with status
+      responses:
+        '200':
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    title: { type: string }
+                    kind: { $ref: '#/components/schemas/SourceKind' }
+                    status: { $ref: '#/components/schemas/SourceStatus' }
+                    error: { type: [string, 'null'] }
+                    creator_claims: { type: integer }
+                    runs: { type: integer }
+                    created_at: { type: string, format: date-time }
+    post:
+      operationId: createSource
+      tags: [Sources]
+      summary: Create a source and start transcription (FR-001)
+      description: Text is segmented locally. Audio (.m4a .mp3 .wav .mp4 .webm .ogg, up to 200 MB; .webm/.ogg come from in-browser recording) needs a transcription provider; without one the source fails and a transcript can be pasted.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+                text: { type: string }
+                title: { type: string }
+                kind: { $ref: '#/components/schemas/SourceKind' }
+                consent_confirmed: { type: boolean, description: 'Required for kind=call' }
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: { type: string, maxLength: 102400 }
+                title: { type: string }
+                kind: { $ref: '#/components/schemas/SourceKind' }
+                consent_confirmed: { type: boolean }
+      responses:
+        '202':
+          description: Accepted
+          content: { application/json: { schema: { type: object, properties: { source_item_id: { type: string }, status: { const: transcribing } } } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '409':
+          description: Same content already added
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422': { $ref: '#/components/responses/Error' }
+
+  /api/sources/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      operationId: getSource
+      tags: [Sources]
+      summary: Source with transcript segments and verified claims
+      responses:
+        '200': { description: 'Source', content: { application/json: { schema: { $ref: '#/components/schemas/SourceDetail' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+
+  /api/sources/{id}/speaker-map:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: setSpeakerMap
+      tags: [Sources]
+      summary: Declare which speaker is the creator, then extract claims (FR-001, FR-003)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [creator_speaker], properties: { creator_speaker: { type: string } } } } }
+      responses:
+        '200': { description: 'Extraction started', content: { application/json: { schema: { type: object, properties: { source_item_id: { type: string }, status: { const: extracting } } } } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+
+  /api/sources/{id}/transcript:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: pasteTranscript
+      tags: [Sources]
+      summary: Paste a manual transcript after a transcription failure
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [text], properties: { text: { type: string } } } } }
+      responses:
+        '202': { description: 'Re-processing' }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/sources/{id}/retry:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: retrySource
+      tags: [Sources]
+      summary: Retry a failed source
+      responses:
+        '202': { description: 'Retrying' }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/sources/{id}/angles:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      operationId: getAngles
+      tags: [Sources]
+      summary: Three proposed lead angles (FR-007)
+      responses:
+        '200':
+          description: Angles
+          content: { application/json: { schema: { type: object, properties: { angles: { type: array, items: { $ref: '#/components/schemas/Angle' } } } } } }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/runs:
+    get:
+      operationId: listRuns
+      tags: [Runs]
+      summary: List runs (no condition info)
+      responses:
+        '200': { description: 'Runs' }
+    post:
+      operationId: createRun
+      tags: [Runs]
+      summary: Create a run (condition assignment + generation + gate) (FR-004, FR-005)
+      description: Condition is assigned by seeded block randomisation and stored server-side; it is not returned. Empty angle_claim_ids means the first proposed angle is used and logged as auto_angle.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source_item_id]
+              properties:
+                source_item_id: { type: string }
+                angle_claim_ids: { type: array, items: { type: string }, description: 'Lead claim first; it must be the creator''s' }
+                angle_choice: { type: string, enum: [picked, custom] }
+                custom_angle: { type: string }
+                format: { type: string, enum: [post, thread], default: thread }
+                memory_enabled: { type: boolean, default: true, description: 'Retired-angle memory ablation toggle' }
+      responses:
+        '202': { description: 'Generating', content: { application/json: { schema: { type: object, properties: { run_id: { type: string }, status: { const: generating } } } } } }
+        '409': { description: 'Source has no verified claims', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { description: 'Angle claims not from the creator speaker', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/runs/{id}:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    get:
+      operationId: getRun
+      tags: [Runs]
+      summary: Poll run state; draft with per-sentence checks
+      responses:
+        '200': { description: 'Run', content: { application/json: { schema: { $ref: '#/components/schemas/Run' } } } }
+        '404': { $ref: '#/components/responses/Error' }
+
+  /api/runs/{id}/retry:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: retryRun
+      tags: [Runs]
+      summary: Re-run the gate after gate_failed, or regenerate after failed
+      responses:
+        '202': { description: 'Retrying' }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/runs/{id}/agents:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      tags: [Agents]
+      operationId: rerunAgents
+      summary: Re-run the Reviewer, Scorer and Decision agents on a draft
+      responses:
+        '202': { description: 'Agents running' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/settings:
+    get:
+      tags: [Agents]
+      operationId: getSettings
+      summary: Agent settings
+      responses:
+        '200': { description: 'Settings', content: { application/json: { schema: { $ref: '#/components/schemas/AgentSettings' } } } }
+    post:
+      tags: [Agents]
+      operationId: saveSettings
+      summary: Turn agents on or off, and choose whether the Decision agent's prediction shows before you decide
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/AgentSettings' } } }
+      responses:
+        '200': { description: 'Saved', content: { application/json: { schema: { $ref: '#/components/schemas/AgentSettings' } } } }
+
+  /api/drafts/{id}/decision:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: decideDraft
+      tags: [Drafts]
+      summary: Accept, edit then accept, or reject (FR-006)
+      description: |
+        Under `gate`, the first accept is refused while a flagged sentence is kept verbatim without an override.
+        Every accept re-runs all checks on the final text. A later accept (e.g. fixing a rejected draft, or editing after confirm) is allowed and invalidates any prior publish confirmation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [accept, edit_then_accept, reject] }
+                final_posts: { type: array, items: { type: string }, description: 'Defaults to the generated posts' }
+                reject_reason: { type: string, enum: [not_me, wrong_claim, repeat, not_worth_posting, other] }
+                reject_note: { type: string }
+                assist: { type: string, enum: [reviewer], description: 'Set when the final text started from the Reviewer agent''s version' }
+                overrides:
+                  type: array
+                  items:
+                    type: object
+                    required: [reason]
+                    properties:
+                      sentence_id: { type: string }
+                      sentence_text: { type: string, description: 'Override a sentence of the final text that the re-check flagged' }
+                      reason: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: Decision recorded; condition revealed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  decision_id: { type: string }
+                  decision: { type: string }
+                  condition: { type: string, enum: [gate, context_only] }
+                  edit_ratio: { type: number }
+                  claim_set_changed: { type: boolean }
+                  recheck_status: { type: string, enum: [clean, flagged, gate_failed] }
+                  text_hash: { type: string, description: 'sha256 of the final text; send it to publish-confirm' }
+                  recheck: { type: object }
+        '409':
+          description: Blocking flags unresolved, gate failed, or already posted
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '400': { description: 'Reject without a reason, or an override without a reason (VALIDATION_FAILED)', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { description: 'Override names a sentence that is not in this draft, or the final text is empty', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/drafts/{id}/publish-confirm:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: confirmPublish
+      tags: [Drafts]
+      summary: Typed confirmation before the irreversible step; unlocks copy and the X compose link
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [text_hash, typed_confirmation], properties: { text_hash: { type: string }, typed_confirmation: { const: POST } } } } }
+      responses:
+        '200': { description: 'Confirmed', content: { application/json: { schema: { type: object, properties: { copy_text: { type: array, items: { type: string } }, compose_url: { type: string }, text_hash: { type: string } } } } } }
+        '409': { description: 'Text changed since check, or re-check flagged', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '422': { description: 'Typed confirmation incorrect', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/drafts/{id}/posted:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: markPosted
+      tags: [Drafts]
+      summary: Creator marks the draft as posted (manual)
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { url: { type: [string, 'null'] } } } } }
+      responses:
+        '200': { description: 'Posted', content: { application/json: { schema: { type: object, properties: { status: { const: posted } } } } } }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/drafts/{id}/note:
+    parameters: [{ $ref: '#/components/parameters/Id' }]
+    post:
+      operationId: addNote
+      tags: [Drafts]
+      summary: Post-publication note (FR-014). Never used by generation or checks.
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { note: { type: string } } } } }
+      responses:
+        '200': { description: 'Saved' }
+
+  /api/metrics/acceptance:
+    get:
+      operationId: getAcceptance
+      tags: [Metrics]
+      summary: Acceptance dashboard data (FR-009). Locked while any draft awaits a decision.
+      responses:
+        '200':
+          description: Either `{locked:true, reason, pending_runs}` or the metrics
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      locked: { const: true }
+                      reason: { type: string }
+                      pending_runs: { type: array, items: { type: object, properties: { id: { type: string }, title: { type: string } } } }
+                  - $ref: '#/components/schemas/Acceptance'
+
+  /api/metrics/drift:
+    get:
+      operationId: getDrift
+      tags: [Metrics]
+      summary: Weekly drift snapshot (FR-012). Upserts the current ISO week.
+      responses:
+        '200': { description: 'Drift report, or ready=false with a reason' }
+
+  /api/metrics/export.csv:
+    get:
+      operationId: exportCsv
+      tags: [Metrics]
+      summary: CSV of all decision data
+      responses:
+        '200': { description: 'CSV', content: { text/csv: { schema: { type: string } } } }
+        '409': { $ref: '#/components/responses/Error' }
+
+  /api/calibration/pairs:
+    get:
+      operationId: getCalibrationPairs
+      tags: [Calibration]
+      summary: Up to 30 unlabelled archive pairs across similarity bands (FR-011)
+      responses:
+        '200': { description: 'Pairs' }
+  /api/calibration/labels:
+    post:
+      operationId: saveCalibrationLabels
+      tags: [Calibration]
+      summary: Save same-angle labels
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { labels: { type: array, items: { type: object, required: [piece_a, piece_b, same_angle], properties: { piece_a: { type: string }, piece_b: { type: string }, same_angle: { type: boolean } } } } } } } }
+      responses:
+        '200': { description: 'Saved' }
+  /api/calibration/fit:
+    post:
+      operationId: fitCalibration
+      tags: [Calibration]
+      summary: Choose the repetition threshold that maximises F1 on your labels
+      responses:
+        '200': { description: 'Threshold', content: { application/json: { schema: { type: object, properties: { threshold: { type: number }, f1: { type: number }, n: { type: integer } } } } } }
+        '422': { $ref: '#/components/responses/Error' }
+
+components:
+  securitySchemes:
+    session: { type: apiKey, in: cookie, name: cos_session, description: 'Set by /api/auth/login or /api/auth/signup. Named __Host-cos_session when served over HTTPS.' }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+  requestBodies:
+    Reason:
+      required: true
+      content: { application/json: { schema: { type: object, required: [reason], properties: { reason: { type: string, minLength: 1 } } } } }
+  responses:
+    Error:
+      description: Error
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+  schemas:
+    ErrorCode:
+      type: string
+      enum: [VALIDATION_FAILED, UNAUTHORIZED, MFA_REQUIRED, WRONG_CREDENTIALS, ACCOUNT_EXISTS, SIGNUP_CLOSED, FORBIDDEN, NOT_FOUND, PAYLOAD_TOO_LARGE, UNSUPPORTED_FILE, CONSENT_REQUIRED, DUPLICATE_SOURCE, INVALID_STATE, UNRESOLVED_FLAGS, TEXT_CHANGED, METRICS_LOCKED, RULE_VIOLATION, RATE_LIMITED, INTERNAL]
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { $ref: '#/components/schemas/ErrorCode' }
+            message: { type: string, description: For people. Do not parse it. }
+            details: { type: object, additionalProperties: true }
+    User:
+      type: object
+      required: [id, email, mfa_enabled, created_at]
+      properties:
+        id: { type: string }
+        email: { type: string, format: email }
+        mfa_enabled: { type: boolean }
+        created_at: { type: string, format: date-time }
+    UserEnvelope: { type: object, required: [user], properties: { user: { $ref: '#/components/schemas/User' } } }
+    SourceKind: { type: string, enum: [voice_memo, call, note] }
+    SourceStatus: { type: string, enum: [transcribing, mapping, extracting, ready, nothing_postable, failed] }
+    ArchivePiece:
+      type: object
+      properties:
+        id: { type: string }
+        external_id: { type: string }
+        text: { type: string }
+        parts: { type: [array, 'null'], items: { type: string } }
+        published_at: { type: string, format: date-time }
+        url: { type: [string, 'null'] }
+        is_holdout: { type: boolean }
+        retired: { type: boolean }
+        retired_reason: { type: [string, 'null'] }
+    Claim:
+      type: object
+      properties:
+        id: { type: string }
+        text: { type: string }
+        speaker: { type: string }
+        is_creator: { type: boolean }
+        char_start: { type: integer }
+        char_end: { type: integer }
+        quote: { type: string, description: 'Verbatim transcript text at [char_start, char_end), verified by string match' }
+    SourceDetail:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        kind: { $ref: '#/components/schemas/SourceKind' }
+        status: { $ref: '#/components/schemas/SourceStatus' }
+        speakers: { type: [array, 'null'], items: { type: string } }
+        creator_speaker: { type: [string, 'null'] }
+        transcript_text: { type: [string, 'null'] }
+        extraction_log: { type: [object, 'null'], properties: { extracted: { type: integer }, kept: { type: integer }, creator_claims: { type: integer }, dropped: { type: array, items: { type: object } } } }
+        error: { type: [string, 'null'] }
+        segments: { type: array, items: { type: object, properties: { id: { type: string }, position: { type: integer }, speaker: { type: string }, start_ms: { type: [integer, 'null'] }, end_ms: { type: [integer, 'null'] }, char_start: { type: integer }, char_end: { type: integer }, text: { type: string } } } }
+        claims: { type: array, items: { $ref: '#/components/schemas/Claim' } }
+        runs: { type: array, items: { type: object } }
+    Angle:
+      type: object
+      properties:
+        id: { type: string }
+        position: { type: integer }
+        lead_claim: { type: object, properties: { id: { type: string }, text: { type: string }, quote: { type: string } } }
+        claim_ids: { type: array, items: { type: string } }
+        rationale: { type: string }
+        closest_archive: { type: [object, 'null'], properties: { id: { type: string }, text: { type: string }, published_at: { type: string }, url: { type: [string, 'null'] }, similarity: { type: number } } }
+        retired_match: { type: boolean }
+    Checks:
+      type: object
+      properties:
+        traceability:
+          type: object
+          properties:
+            status: { type: string, enum: [supported, partial, unsupported] }
+            reason: { type: string }
+            type: { type: string, enum: [assertion, connective], description: 'Effective type; a connective that carries facts is checked as an assertion' }
+        repetition:
+          type: object
+          properties:
+            flag: { type: boolean }
+            severity: { type: [string, 'null'], enum: [normal, high, null] }
+            threshold: { type: number }
+            matches: { type: array, items: { type: object, properties: { piece_id: { type: string }, similarity: { type: number }, text: { type: string }, published_at: { type: string }, url: { type: [string, 'null'] }, retired: { type: boolean } } } }
+            retired_match: { type: [object, 'null'] }
+        voice:
+          type: object
+          properties:
+            flag: { type: boolean }
+            features: { type: array, items: { type: object, properties: { feature: { type: string }, z: { type: number }, archive_rate: { type: number } } } }
+    Run:
+      type: object
+      properties:
+        run_id: { type: string }
+        status: { type: string, enum: [generating, gate_failed, in_review, decided, failed] }
+        error: { type: [string, 'null'] }
+        format: { type: string, enum: [post, thread] }
+        condition: { type: [string, 'null'], enum: [gate, context_only, null], description: 'null until a decision exists' }
+        checks_visible: { type: boolean }
+        enforce_flags: { type: boolean }
+        memory_enabled: { type: boolean }
+        source: { type: object, description: 'Transcript text and segments for the source panel' }
+        claims: { type: array, items: { $ref: '#/components/schemas/Claim' } }
+        draft:
+          type: [object, 'null']
+          properties:
+            id: { type: string }
+            gate_status: { type: string, enum: [clean, flagged, gate_failed, hidden] }
+            voice: { type: [object, 'null'] }
+            confirmed: { type: boolean }
+            posted_at: { type: [string, 'null'] }
+            posts:
+              type: array
+              items:
+                type: object
+                properties:
+                  position: { type: integer }
+                  text: { type: string }
+                  sentences:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        text: { type: string }
+                        type: { type: string, enum: [assertion, connective] }
+                        supports: { type: array, items: { type: string } }
+                        checks: { oneOf: [{ $ref: '#/components/schemas/Checks' }, { type: 'null' }] }
+                        blocking: { type: boolean }
+        decisions: { type: array, items: { type: object } }
+        agents:
+          type: object
+          description: 'Keyed by agent. Under context_only every agent is {status: hidden} until a decision exists; the decision agent is hidden before the decision unless show_recommendation is on.'
+          properties:
+            reviewer: { $ref: '#/components/schemas/AgentRun' }
+            scorer: { $ref: '#/components/schemas/AgentRun' }
+            decision: { $ref: '#/components/schemas/AgentRun' }
+        agent_settings: { $ref: '#/components/schemas/AgentSettings' }
+    AgentSettings:
+      type: object
+      properties:
+        agents_enabled: { type: boolean, default: true }
+        show_recommendation: { type: boolean, default: false }
+    AgentRun:
+      type: object
+      properties:
+        status: { type: string, enum: [running, done, failed, hidden] }
+        model: { type: string }
+        ms: { type: [integer, 'null'] }
+        error: { type: [string, 'null'] }
+        trace:
+          type: array
+          description: Every step the agent took
+          items: { type: object, properties: { step: { type: integer }, kind: { type: string, enum: [thought, tool, submit, submit_rejected] }, tool: { type: string }, input: { type: object }, result: {}, error: {} } }
+        output:
+          oneOf:
+            - $ref: '#/components/schemas/ReviewerOutput'
+            - $ref: '#/components/schemas/ScorerOutput'
+            - $ref: '#/components/schemas/DecisionOutput'
+    ReviewerOutput:
+      type: object
+      properties:
+        summary: { type: string }
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              sentence_id: { type: string }
+              problem: { type: string, enum: [unsupported, partial, repeat, voice, clarity, channel] }
+              action: { type: string, enum: [replace, remove, keep] }
+              replacement: { type: string }
+              supports: { type: array, items: { type: string } }
+              note: { type: string }
+        revised_posts: { type: array, items: { type: string } }
+        changed: { type: boolean }
+        verification:
+          type: object
+          description: The server re-runs every check on revised_posts; the agent's own claims are not trusted
+          properties: { blocking: { type: integer }, gate_failed: { type: boolean }, sentences: { type: array, items: { type: object } }, channel: { type: array, items: { type: object } } }
+    ScorerOutput:
+      type: object
+      properties:
+        overall: { type: number }
+        comment: { type: string }
+        dimensions:
+          type: object
+          description: 'traceability, novelty and voice_fit are measured by rules (by: rule); hook and clarity are judged by the model (by: model)'
+          additionalProperties: { type: object, properties: { score: { type: number, minimum: 1, maximum: 5 }, reason: { type: string }, by: { type: string, enum: [rule, model] } } }
+    DecisionOutput:
+      type: object
+      properties:
+        recommendation: { type: string, enum: [accept, edit, reject] }
+        reject_reason: { type: string, enum: [not_me, wrong_claim, repeat, not_worth_posting, other] }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        rationale: { type: string }
+    Rate:
+      type: object
+      properties:
+        n: { type: integer }
+        light_edit: { type: integer }
+        rate: { type: [number, 'null'] }
+        ci95: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+    Acceptance:
+      type: object
+      properties:
+        locked: { const: false }
+        below_prerequisite: { type: boolean }
+        runs: { type: integer }
+        by_condition: { type: object, properties: { gate: { $ref: '#/components/schemas/Rate' }, context_only: { $ref: '#/components/schemas/Rate' } } }
+        by_memory: { type: object, properties: { on: { $ref: '#/components/schemas/Rate' }, off: { $ref: '#/components/schemas/Rate' } } }
+        by_week: { type: array, items: { type: object, properties: { week: { type: string }, n: { type: integer }, rate: { type: [number, 'null'] } } } }
+        rejections: { type: object, properties: { total: { type: integer }, fixed: { type: integer }, abandoned: { type: integer }, pending: { type: integer }, reasons: { type: object } } }
+        flags: { type: object, properties: { shown: { type: integer }, overridden: { type: integer }, led_to_edit: { type: integer }, override_log: { type: array, items: { type: object } } } }
+        agents:
+          type: object
+          properties:
+            decision: { type: object, description: 'Agreement between the Decision agent and your first decision, overall, by condition, and as a confusion count' }
+            reviewer: { type: object, properties: { runs_with_fixes: { type: integer }, used: { type: integer }, light_rate_when_used: { type: [number, 'null'] }, light_rate_when_not_used: { type: [number, 'null'] } } }
+            scorer: { type: object, properties: { n: { type: integer }, mean_overall_light_accept: { type: [number, 'null'] }, mean_overall_other: { type: [number, 'null'] } } }
+        table: { type: array, items: { type: object } }

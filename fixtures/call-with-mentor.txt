@@ -1,0 +1,8 @@
+Kaifi [00:00]: Thanks for jumping on. I wanted to talk about moving from SDE3 into forward deployed engineering.
+Priya [00:12]: Sure. The biggest shift is that the customer becomes your code reviewer, and they review behaviour, not diffs.
+Kaifi [00:31]: That matches what I saw last month. I sat with a customer for one hour and rewrote the onboarding flow the same afternoon.
+Priya [00:48]: Most engineers I hire for FDE roles fail because they wait for a spec. The good ones write the spec while the customer is talking.
+Kaifi [01:10]: I think my frontend background helps, because the UI is where the customer's confusion actually shows up.
+Kaifi [01:25]: Every confused click is a bug report the customer will never file.
+Priya [01:40]: Exactly. And keep a log of every decision you make on site, because nobody back at the office will remember why.
+Kaifi [01:58]: I started a decision log two weeks ago and it already saved me from re-litigating the same pricing question twice.

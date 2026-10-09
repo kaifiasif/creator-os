@@ -1,0 +1,5 @@
+Shipping small is not about speed, it is about being wrong in smaller pieces. I keep relearning that every quarter.
+
+Last week we deleted the date formatting library and the bundle dropped by 180 KB on every page.
+
+The lesson I keep coming back to is that the waterfall tells you more than the bundle analyzer.

@@ -1,0 +1,273 @@
+{
+ "format": "paste",
+ "include_replies": false,
+ "items": [
+  {
+   "external_id": "184000000000000000",
+   "text": "Shipped my first feature behind a flag today. Nobody noticed. That is the point.",
+   "published_at": "2026-01-05T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000000000"
+  },
+  {
+   "external_id": "184000000000007919",
+   "text": "Most React performance problems I have debugged were not React problems. They were data fetching problems wearing a React costume.",
+   "published_at": "2026-01-11T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000007919"
+  },
+  {
+   "external_id": "184000000000015838",
+   "text": "I used to think senior meant knowing more APIs. Now I think it means knowing which problems not to solve.",
+   "published_at": "2026-01-17T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000015838"
+  },
+  {
+   "external_id": "184000000000023757",
+   "text": "Week 3 of building in public. 41 followers, 2 DMs, 1 person who actually used the thing. The 1 matters most.",
+   "published_at": "2026-01-23T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000023757"
+  },
+  {
+   "external_id": "184000000000031676",
+   "text": "Hot take: useEffect is not a lifecycle method. Stop treating it like componentDidMount with extra steps.",
+   "published_at": "2026-01-29T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000031676"
+  },
+  {
+   "external_id": "184000000000039595",
+   "text": "I rewrote our form library wrapper for the third time. Each rewrite deleted more code than it added. That is how I know it is getting better.",
+   "published_at": "2026-02-04T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000039595"
+  },
+  {
+   "external_id": "184000000000047514",
+   "text": "Forward deployed engineering is just frontend work where the customer sits next to you. I am weirdly excited about that.",
+   "published_at": "2026-02-10T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000047514"
+  },
+  {
+   "external_id": "184000000000055433",
+   "text": "The hardest bug this month was a timezone. It is always a timezone.",
+   "published_at": "2026-02-16T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000055433"
+  },
+  {
+   "external_id": "184000000000063352",
+   "text": "Spent the evening reading the React compiler RFC. My takeaway: memo everything was always a smell, not a strategy.",
+   "published_at": "2026-02-22T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000063352"
+  },
+  {
+   "external_id": "184000000000071271",
+   "text": "If your design system needs a 40 page doc to explain a button, the button is wrong.",
+   "published_at": "2026-02-28T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000071271"
+  },
+  {
+   "external_id": "184000000000079190",
+   "text": "I talk to one user every Friday. It has changed more of my roadmap than any analytics dashboard.",
+   "published_at": "2026-03-06T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000079190"
+  },
+  {
+   "external_id": "184000000000087109",
+   "text": "Shipping small is not about speed. It is about being wrong in smaller pieces.",
+   "published_at": "2026-03-12T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000087109"
+  },
+  {
+   "external_id": "184000000000095028",
+   "text": "Code review tip I wish I learned earlier: comment on the thing you would regret not saying, skip the rest.",
+   "published_at": "2026-03-18T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000095028"
+  },
+  {
+   "external_id": "184000000000102947",
+   "text": "Things I stopped doing as an SDE3: arguing about tabs, writing clever reducers, saying yes to every meeting.",
+   "published_at": "2026-03-24T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000102947"
+  },
+  {
+   "external_id": "184000000000110866",
+   "text": "My side project has 12 users. I know all of their names. I do not want to lose that when it has 1200.",
+   "published_at": "2026-03-30T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000110866"
+  },
+  {
+   "external_id": "184000000000118785",
+   "text": "Accessibility is not a feature you add at the end. It is a bug you ship at the start.",
+   "published_at": "2026-04-05T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000118785"
+  },
+  {
+   "external_id": "184000000000126704",
+   "text": "I asked a customer to share their screen for five minutes and found three bugs our tests never would.",
+   "published_at": "2026-04-11T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000126704"
+  },
+  {
+   "external_id": "184000000000134623",
+   "text": "Building in public is mostly building in silence and posting about it occasionally.",
+   "published_at": "2026-04-17T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000134623"
+  },
+  {
+   "external_id": "184000000000142542",
+   "text": "Server components made me think about where data lives again. That alone was worth the migration pain.",
+   "published_at": "2026-04-23T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000142542"
+  },
+  {
+   "external_id": "184000000000150461",
+   "text": "A good abstraction is one you can delete in an afternoon.",
+   "published_at": "2026-04-29T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000150461"
+  },
+  {
+   "external_id": "184000000000158380",
+   "text": "Today I learned that the slowest part of our app was a date formatting library imported on every page. 180 KB for a date.",
+   "published_at": "2026-05-05T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000158380"
+  },
+  {
+   "external_id": "184000000000166299",
+   "text": "The best interview question I have been asked: tell me about a time you deleted code you were proud of.",
+   "published_at": "2026-05-11T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000166299"
+  },
+  {
+   "external_id": "184000000000174218",
+   "text": "Frontend is not a junior specialty. The browser is the most hostile runtime most of us will ever ship to.",
+   "published_at": "2026-05-17T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000174218"
+  },
+  {
+   "external_id": "184000000000182137",
+   "text": "I keep a doc called things I was wrong about. It is longer than my resume.",
+   "published_at": "2026-05-23T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000182137"
+  },
+  {
+   "external_id": "184000000000190056",
+   "text": "Every time I add a loading spinner I ask if the wait is the bug.",
+   "published_at": "2026-05-29T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000190056"
+  },
+  {
+   "external_id": "184000000000197975",
+   "text": "Moving toward FDE roles means I am practicing a new skill: saying I do not know yet in front of a customer.",
+   "published_at": "2026-06-04T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000197975"
+  },
+  {
+   "external_id": "184000000000205894",
+   "text": "Two years ago I would have reached for Redux. Today I reach for the URL.",
+   "published_at": "2026-06-10T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000205894"
+  },
+  {
+   "external_id": "184000000000213813",
+   "text": "Pair programming with a designer for one afternoon fixed more UX than a quarter of tickets.",
+   "published_at": "2026-06-16T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000213813"
+  },
+  {
+   "external_id": "184000000000221732",
+   "text": "I measure a week by one question: did someone use what I shipped?",
+   "published_at": "2026-06-22T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000221732"
+  },
+  {
+   "external_id": "184000000000229651",
+   "text": "Writing tests after the bug report is fine. Writing the same bug twice is not.",
+   "published_at": "2026-06-28T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000229651"
+  },
+  {
+   "external_id": "184000000000237570",
+   "text": "Most of my good ideas come from voice memos on walks. Most of my bad ones come from late night Slack.",
+   "published_at": "2026-07-04T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000237570"
+  },
+  {
+   "external_id": "184000000000245489",
+   "text": "Stop optimizing the bundle until you have looked at the waterfall.",
+   "published_at": "2026-07-10T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000245489"
+  },
+  {
+   "external_id": "184000000000253408",
+   "text": "Users do not read. They scan, click, and leave. Design for the scan.",
+   "published_at": "2026-07-16T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000253408"
+  },
+  {
+   "external_id": "184000000000261327",
+   "text": "I deleted our custom modal and used the native dialog element. 300 lines gone, focus trapping fixed for free.",
+   "published_at": "2026-07-22T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000261327"
+  },
+  {
+   "external_id": "184000000000269246",
+   "text": "The real job of a senior frontend engineer is translating between design, product, and the browser.",
+   "published_at": "2026-07-28T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000269246"
+  },
+  {
+   "external_id": "184000000000277165",
+   "text": "Small wins this week: fixed a flaky test, mentored an intern through their first PR, slept 7 hours twice.",
+   "published_at": "2026-08-03T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000277165"
+  },
+  {
+   "external_id": "184000000000285084",
+   "text": "Unpopular opinion: most dashboards are where decisions go to be postponed.",
+   "published_at": "2026-08-09T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000285084"
+  },
+  {
+   "external_id": "184000000000293003",
+   "text": "I am done saying ship fast and break things. Ship small and notice things.",
+   "published_at": "2026-08-15T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000293003"
+  },
+  {
+   "external_id": "184000000000300922",
+   "text": "Customer calls teach you which features are load bearing. Usually not the ones on the roadmap.",
+   "published_at": "2026-08-21T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000300922"
+  },
+  {
+   "external_id": "184000000000308841",
+   "text": "If you cannot explain your state management in one sentence, you have too much of it.",
+   "published_at": "2026-08-27T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000308841"
+  },
+  {
+   "external_id": "184000000000316760",
+   "text": "Thread: what I learned migrating a 200k line React app to TypeScript strict mode.",
+   "published_at": "2026-09-02T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000316760"
+  },
+  {
+   "external_id": "184000000000324679",
+   "text": "1. Turn it on per folder, not all at once. A big bang migration dies in review.",
+   "published_at": "2026-09-02T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000324679",
+   "in_reply_to": "184000000000316760"
+  },
+  {
+   "external_id": "184000000000332598",
+   "text": "2. Every any you leave is a promise to future you. Write a ticket for each one.",
+   "published_at": "2026-09-02T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000332598",
+   "in_reply_to": "184000000000324679"
+  },
+  {
+   "external_id": "184000000000340517",
+   "text": "3. The migration found 14 real bugs. That alone paid for it.",
+   "published_at": "2026-09-02T15:00:00Z",
+   "url": "https://x.com/i/status/184000000000340517",
+   "in_reply_to": "184000000000332598"
+  }
+ ]
+}
